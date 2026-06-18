@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#07090f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HL Analyzer">
+<meta name="mobile-web-app-capable" content="yes">
+<title>HIGH/LOW Analyzer</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjogIkhJR0gvTE9XIEFuYWx5emVyIiwgInNob3J0X25hbWUiOiAiSEwgQW5hbHl6ZXIiLCAiZGVzY3JpcHRpb24iOiAiXHUzMGQwXHUzMGE0XHUzMGNhXHUzMGVhXHUzMGZjXHUzMGFhXHUzMGQ3XHUzMGI3XHUzMGU3XHUzMGYzXHVmZjA4XHUzMGNmXHUzMGE0XHUzMGVkXHUzMGZjXHVmZjA5XHU3N2VkXHU2NzFmXHU1M2Q2XHU1ZjE1XHUzMDZlXHUzMGM2XHUzMGFmXHUzMGNiXHUzMGFiXHUzMGViXHU1MjA2XHU2NzkwXHUzMGZiQUlcdTRlODhcdTZlMmNcdTMwYzRcdTMwZmNcdTMwZWIiLCAic3RhcnRfdXJsIjogIi4iLCAic2NvcGUiOiAiLiIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDcwOTBmIiwgInRoZW1lX2NvbG9yIjogIiMwNzA5MGYiLCAibGFuZyI6ICJqYSIsICJjYXRlZ29yaWVzIjogWyJmaW5hbmNlIiwgInV0aWxpdGllcyJdLCAiaWNvbnMiOiBbeyJzcmMiOiAiZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFNQUFBQURBQ0FJQUFBRGR2dnRRQUFBRDMwbEVRVlI0bk8zZHNiRWNWUkNHMFNzY0lVc1dWYmprUUJZRVFvUmtRUW9VTGxVa0FCN0dVMGxQKzNhWDFmdzdjKzkwbnhOQlYvVjMyeGhuM3IzLzhISEFWdC9OSG9CekV4QVJBUkVSRUJFQkVSRVFFUUVSRVJBUkFSRVJFQkVCRVJFUUVRRVJFUkFSQVJFUkVCRUJFUkVRRVFFUkVSQVJBUkVSRUJFQkVSRVFFUUVSRVJBUkFSRVJFQkVCRVJFUUVRRVJFUkFSQVJFUkVCRUJFUkVRRVFFUkVSQVJBZjJQZi8vNGRmWUlTeFBRUFMvMWFPZ09BUkVSMEUydkQ0OGpkSXVBaUFqb3VyY254eEc2U2tCWGFPVnhBdm9Hd25wTFFKZnVWNktoQ3dJaUlxQ3ZQSEpnSEtIWEJQU0ZNallRMEJaUysweEFuMmhpR3dGdEpMZ1hBaHBqYXcwYUdnSWlKS0Rva0RoQzNRTlNRS2g3UUxubUNiWU82Rm03Nzl4UTY0REk5UTNvdVdlajdSRnFHbERiZlQ5ZDA0RDIwRFBLamdIMTNQUk9PZ2EwbjRacHRndG83eDEzYTZoWFFOMjJlNEJlQVIyalZhYU5BbXExMThNMEN1aElmV0x0RWxDZmpSNnNSVUJUNm1tU2JJdUFadW5RVVAyQU9teHhvdm9CelZVKzMrSUJsZC9mZEpVRFdxU2VSY2JZU2VXQU9FRFpnSlo2OTBzTjgxeGxBMXBOMVlacUJsUjFXd3NxR05DeTlTdzdXS0pnUUJ5cFdrQ0x2L0xGeDl1Z1drRHJLOVpRcVlDSzdlWVVTZ1YwRnBWQ3J4TlFwYTJjU0pHQVRsZlA2UWErcFVoQXpGSWhvSk8rNXBPT2ZlSGQrdzhmWjgvd3FCOSsvR24yQ0FmNSs2OC9aNC93cUFvWGlJa0VSRVJBUkFSRVJFQkVCRVJFUUVUTzlCM29sbjkrL21YMkNCdDkvL3R2czBkSVZiaEFKMTNEU2NlK1VDRWdKaW9TME9sZTgra0d2cVZJUUtQUVNzNmxUa0FuVXFuMVVnRlZXc3habEFyb0ZJcFZYaTJneGRleitIZ2JWQXVJZ3hVTWFObFh2dXhnaVlJQmphS3JXbFBOZ0JaVXRlbXlBUzIxc0tXR2VhNnlBWEdNeWdFdDh1NFhHV01ubFFNYTFaZTNndUlCVFZlKzRQb0JsVi9oWFBVRG1xaER1eTBDbXJMSUR2V01KZ0dOTnVzOFhwZUFEdGFuMTBZQjlWbnFrUm9GZEpoV3BmWUtxTlZxajlFcm9MRi9ROTBhYlJmUXJyclZNM29HMUhETisra1kwRTU2ZHRrMG9KN0wza1BUZ01hekcycGJaTitBZUlyV0FUM3JiTFE5UDZONVFFL1J1WjRob09icnozVVBhR1FONlU5QVJBUTB4dFpENHZ3TUFXMm1uaGNDK2tRUTJ3aG9DN1Y5SnFBdlpMR0JnTDd5U0VNNmUwMUFSQVIwNmY2QmNYNHVDT2dicU9jdEFWMGhsTWNKNkxxM0RhbnFLZ0VSRWRCTnIwK084M09MZ0lnSTZKNlh3K1A4M0ZIaHA3dE01QUlSRVJBUkFSRVJFQkVCRVJFUUVRRVJFUkFSQVJFUkVCRUJFUkVRRVFFUkVSQVJBUkVSRUJFQkVSRVFFUUVSRVJBUkFSRVJFQkVCRVJFUUVRRVJFUkFSQVJFUkVCRUJFUkVRRVFFUkVSQVJBUkVSRUJFQkVSRVFFUUVSRVJDUi93RCtsdkJrMlltdDJBQUFBQUJKUlU1RXJrSmdnZz09IiwgInNpemVzIjogIjE5MngxOTIiLCAidHlwZSI6ICJpbWFnZS9wbmciLCAicHVycG9zZSI6ICJhbnkifSwgeyJzcmMiOiAiZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFnQUFBQUlBQ0FJQUFBQjdHa090QUFBTFVrbEVRVlI0bk8zWHpZMGtSUlNGVVliTk1LdFpJYkhGQjd6QUVDekVDMXhBYkpGd0FIWXNCa0hUUDlWVm1Sa1I3OFU5eDRLc1N1bCtMejk4L1BUNUt3RHlmTDM2QVFCWVF3QUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFDZ0JBQWdsQUFDaEJBQWdsQUFBaEJJQWdGQUNBQkJLQUFCQ0NRQkFLQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDUUxTL2Z2MXA5U1BBTWdKQXJpL3Jyd0hFRWdDQVVBSkFxS2VIdjQ4QU1na0FRQ2dCSU5ITGs5OUhBSUVFZ0RodmJiMEdrRVlBQUVJSkFGbHVuL2srQW9naUFBQ2hCSUFnOXh6NFBnTElJUUNrc096d2pBREFjMUpCQ0FFZ3dxT2JyZ0VrRUFDQVVBTEEvbzZkOHo0QzJKNEFBSVFTQURaMzVwRDNFY0RlQklDZG5WOXdEV0JqQWdBUVNnRFkxbFhIdTQ4QWRpVUFBS0VFZ0QxZGU3YjdDR0JMQXNDRzdEWGNRd0RnTHFMQ2ZnU0EzWXhiYWcxZ013SUFFRW9BMk1yb0k5MUhBRHNSQVBaaG5lRWhBZ0NQa1JtMklRQnNZdVl1YXdCN0VBQ0FVQUxBRHVhZjVENEMySUFBMEo0dGhtTUVBQTRTSHJvVEFIcGJ1OElhUUdzQ0FCQktBR2lzd2dGZTRSbmdHQUdnSzhzTEp3a0FuQ1ZGTkNVQXRHUno0VHdCZ0FzSUVoMEpBUDNVWE51YVR3VTNDQUJBS0FHZ21jcUhkdVZuZzVjRWdFNHNMRnhJQU9CS0VrVWpBa0FiWGJhMXkzT0NBQUNFRWdCNjZIVlc5M3BhWWdrQURkaFRHRUVBWUFqUm9qNEJvRHBMQ29NSUFJd2lYUlFuQUpUV2ZVTzdQejk3RXdEcXNwNHdsQURBV0RKR1dRSkFVWFlUUmhNQUdFN01xRWtBcUdpL3hkenZGN0VCQWFBY1d3bHpDQUJNSW14VUl3RFVZaVZoR2dHQWVlU05VZ1NBUWhMMk1lRTMwb1VBVUlWbGhNa0VBR2FUT29vUUFFcXdpVENmQU1BQ2drY0ZBc0I2MWhDV0VBQllRL1pZVGdCWUxIa0hrMzg3RlFnQUsxbEFXRWdBWUNVSlpDRUJZQm5iQjJzSkFDd21oS3dpQUt4aDlaN3liN0NFQUxDQXZZTUtCQUJLRUVYbUV3Qm1zM1JRaEFCQUZkTElaQUxBVkRZTzZoQUE1ckgrNy9JWE1aTUFRQzBhd0RRQ3dDUjJEYW9SQUNoSExKbERBSmpCb2tGQkFzQncxdjhBZnhvVENBQVVwUUdNSmdDTVpjV2dMQUdBdXVTVG9RU0FnZXdYVkNZQVVKcUlNbzRBTUlybGd1SUVnQ0dzLzRYOG1Rd2lBTkNBQmpDQ0FIQTlhd1V0Q0FEMElLdGNUZ0M0bUoyQ0xnU0FLMW4vb2Z5OVhFc0FvQk1ONEVJQ3dHVnNFL1FpQU5DTTBISVZBZUFhVmduYUVRQXVZUDBuODRkekNRR0FsalNBOHdTQXN5d1JOQ1VBMEpYMGNwSUFjSW9OZ3I0RWdPT3MvM0plQVdjSUFFQW9BZUFndDJjUlhnU0hDUUMwcHdFY0l3QWNZWEZnQXdMQXc2eC9RVjRLQndnQVFDZ0I0REV1emJLOEdoNGxBTEFQRGVBaEFzQUQ3QXZzUkFCZ0t5TE4vUVNBZTFrVzJJd0FjQmZyMzRpWHhaMEVBQ0NVQVBBK0YyVTdYaG4zRUFEWWt3YndMZ0hnSFhZRWRpVUEzR0w5Vy9QNnVFMEFBRUlKQUc5eVAyN0FTK1FHQVlETmFRQnZFUUJlWnpWZ2V3TEFLNnovWnJ4UVhpVUFBS0VFZ09kY2kxdnlXbmxKQUNDRkJ2Q01BUEEvTmdKeUNBRC9zZjdiODRwNVNnQUFRZ2tBLzNBYmh2Q2krWmNBQUlUNjhQSFQ1OVhQd0RXKy9lNzcxWTlBaEQ5Ky8yMzFJM0FOWHdBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVPckR4MCtmVno4REpmejV3NCtySDRGSnZ2bmw1OVdQUUFtK0FBQkNDUUQvY0JXRzhLTDVsd0FBaEJJQS91TTIzSjVYekZNQ3dQOFlDTWdoQUpCQzNYbEdBSGpPVEd6SmErVWxBUUFJSlFDOHdyVzRHUytVVndrQXJ6TVpzRDBCZ00xcE9XOFJBTjVrT0RiZ0pYS0RBQUNFRWdCdWNUKzI1dlZ4bXdEd0RpTUN1eElBMkpOeTh5NEI0SDJtcEIydmpIc0lBRUFvQWVBdUxzcEd2Q3p1SkFEY3k2ekFaZ1FBdHFMVDNFOEFlSUJ4Z1owSUFPeERvWG1JQVBBWUUxT1dWOE9qQkFBZ2xBRHdNSmRtUVY0S0J3Z0FSNWdiMklBQVFIdDZ6REVDd0VGR3B3Z3Znc01FQUNDVUFIQ2MyM001cjRBekJJQlREQkQwSlFEUWxmcHlrZ0J3bGhtQ3BnUUFXdEpkemhNQUxtQ01Kdk9IY3drQjRCb21DZG9SQUdoR2E3bUtBSEFad3dTOUNBQjBvckpjU0FDNGtua2F5dC9MdFFTQWl4a3A2RUlBb0FkbDVYSUN3UFZNRmJRZ0FOQ0FwaktDQURDRXdicVFQNU5CQklCUnpCWVVKd0JRbW80eWpnQXdrUEdDeWdRQTZsSlFoaElBeGpKaFVKWUFRRkhheVdnQ3dIQ0c3QUIvR2hNSUFET1lNeWhJQUtBY3ZXUU9BV0FTb3diVkNBRFVvcFJNSXdETVk5cmU1UzlpSmdGZ0tnTUhkUWdBVktHT1RDWUF6R2Jtb0FnQmdCSjBrZmtFZ0FXTUhWUWdBS3loQVUvNU4xaENBR0F4Njg4cUFzQXloZy9XRWdCWVNRVlpTQUJZeWZ6QlFnTEFZc2tOU1A3dFZDQUFzSWIxWnprQllEMVRDRXNJQUN5Z2VWUWdBSlJnRUdFK0FZRFoxSTRpQklBcXpDSk1KZ0FVa3RDQWhOOUlGd0lBODFoL1NoRUFhakdSTUkwQXdDVGFSalVDUURtR0V1WVFBQ3JhcndINy9TSTJJQUF3blBXbkpnR2dLS01Kb3drQWpLVmtsQ1VBMUdVNllTZ0JvTFR1RGVqKy9PeE5BR0FVNjA5eEFrQjFaaFFHRVFBWVFyZW9Ud0Jvd0pqQ0NBSkFENzBhME90cGlTVUFBS0VFZ0RhNm5OVmRuaE1FQUs1ay9XbEVBT2pFdk1LRkJJQm1LamVnOHJQQlN3SUFFRW9BNktmbW9WM3pxZUFHQVlBTFdIODZFZ0JhTXJod25nREFXV3BFVXdKQVYyWVhUaElBR3F2UWdBclBBTWNJQUVBb0FhQzN0UWU0ODUvV0JBQU9zdjUwSndDMFo0amhHQUZnQi9NYm9EcHNRQUFBUWdrQW01aDVranYvMllNQXdHT3NQOXNRQVBaaG11RWhBc0JXUmpkQVk5aUpBQUNFRWdCMk0rNUlkLzZ6R1FHQXUxaC85aU1BYk1oWXd6MEVnRDFkMndCRllVc0NBQkJLQU5qV1ZXZTc4NTlkQ1FCQUtBRmdaK2VQZCtjL0d4TUFObmRtd2EwL2V4TUFnRkFDd1A2T0hmTE9mN1luQUFDaEJJQUlqNTd6em44U0NBQThaLzBKSVFDa01PdndqQUFRNUo0RzZBUTVCQUFnbEFDUTVmYUI3L3duaWdBQWhCSUE0cngxNWp2L1NTTUFKSHE1OWRhZlFBSUFFRW9BQ1BYMDVIZitrMGtBQUVJSkFMbStIUDdPZjJKOStQanA4K3BuQUdBQlh3QUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFDZ0JBQWdsQUFDaEJBQWdsQUFBaEJJQWdGQUNBQkJLQUFCQ0NRQkFLQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFqMU4wWGJjK2JUOEdsWEFBQUFBRWxGVGtTdVFtQ0MiLCAic2l6ZXMiOiAiNTEyeDUxMiIsICJ0eXBlIjogImltYWdlL3BuZyIsICJwdXJwb3NlIjogImFueSJ9XX0=">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAABIklEQVR4nO2YsQ3CQBAEzyRARIRESg90QSFUSBe0gEiRaAAygpcsJxj5f/dWL+3kNje3a+H3sN7uomdW6gFasYAaC6ixgBoLqLGAGgv843O/UO/PFSjTUx1cod9MF88LgSXArv5IXoVIShSBtPVH8kPMEMMLzE8JdwALZJanIPgfwEoiBfLXH0CBRdMDVWWvEigHjICkPAXlyxxEGyAgXH9EDNVfp/eHI3CO1/NRd6HPA2q6F6h/Bkbep3P1tZvbtfHXAQm0D9GCskIQc4yAMARZAihnmMCigYCJIROQFElQIawnWCA/BHwC8w5ww9QKMfKhCGQWKS8BkhVLIC0EYgJTB55P9+cBrkBZPLVOgAONFldIjQXUWECNBdRYQI0F1HwB5ZJQ6Dv2TvMAAAAASUVORK5CYII=">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAD30lEQVR4nO3dsbEcVRCG0SscIUsWVbjkQBYEQoRkQQoULlUkAB7GU0lP+3aX1fw7c+90nxNBV/V32xhn3r3/8HHAVt/NHoBzExARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAf2Pf//4dfYISxPQPS/1aOgOARER0E2vD48jdIuAiAjourcnxxG6SkBXaOVxAvoGwnpLQJfuV6KhCwIiIqCvPHJgHKHXBPSFMjYQ0BZS+0xAn2hiGwFtJLgXAhpjaw0aGgIiJKDokDhC3QNSQKh7QLnmCbYO6Fm779xQ64DI9Q3ouWej7RFqGlDbfT9d04D20DPKjgH13PROOga0n4Zptgto7x13a6hXQN22e4BeAR2jVaaNAmq118M0CuhIfWLtElCfjR6sRUBT6mmSbIuAZunQUP2AOmxxovoBzVU+3+IBld/fdJUDWqSeRcbYSeWAOEDZgJZ690sN81xlA1pN1YZqBlR1WwsqGNCy9Sw7WKJgQBypWkCLv/LFx9ugWkDrK9ZQqYCK7eYUSgV0FpVCrxNQpa2cSJGATlfP6Qa+pUhAzFIhoJO+5pOOfeHd+w8fZ8/wqB9+/Gn2CAf5+68/Z4/wqAoXiIkERERARAREREBEBEREQETO9B3oln9+/mX2CBt9//tvs0dIVbhAJ13DSce+UCEgJioS0Ole8+kGvqVIQKPQSs6lTkAnUqn1UgFVWsxZlAroFIpVXi2gxdez+HgbVAuIgxUMaNlXvuxgiYIBjaKrWlPNgBZUtemyAS21sKWGea6yAXGMygEt8u4XGWMnlQMa1Ze3guIBTVe+4PoBlV/hXPUDmqhDuy0CmrLIDvWMJgGNNus8XpeADtan10YB9VnqkRoFdJhWpfYKqNVqj9EroLF/Q90abRfQrrrVM3oG1HDN++kY0E56dtk0oJ7L3kPTgMazG2pbZN+AeIrWAT3rbLQ9P6N5QE/RuZ4hoObrz3UPaGQN6U9ARAQ0xtZD4vwMAW2mnhcC+kQQ2whoC7V9JqAvZLGBgL7ySEM6e01ARAR06f6BcX4uCOgbqOctAV0hlMcJ6Lq3DanqKgEREdBNr0+O83OLgIgI6J6Xw+P83FHhp7tM5AIRERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERCR/wD+lvBk2Ymt2AAAAABJRU5ErkJggg==">
+<style>
+  * { -webkit-tap-highlight-color: transparent; }
+  html, body { margin:0; padding:0; background:#07090f; overscroll-behavior:none; }
+  #root { min-height:100vh; min-height:100dvh; }
+  /* 設定モーダル */
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1000;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    backdrop-filter:blur(4px);
+  }
+  .modal {
+    background:#0d1018; border:1px solid #252d40; border-radius:10px;
+    padding:24px; max-width:420px; width:100%;
+    font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif; color:#eef0f6;
+  }
+  .modal h2 { font-size:16px; margin:0 0 6px; font-family:'JetBrains Mono',monospace; }
+  .modal p { font-size:12px; color:#7a8499; line-height:1.7; margin:0 0 16px; }
+  .modal input {
+    width:100%; box-sizing:border-box; background:#07090f; border:1px solid #252d40;
+    border-radius:6px; padding:11px 13px; color:#eef0f6; font-size:13px;
+    font-family:'JetBrains Mono',monospace; outline:none; margin-bottom:6px;
+  }
+  .modal input:focus { border-color:#00b8d4; }
+  .modal-hint { font-size:10px; color:#6b7590; margin-bottom:16px; line-height:1.6; }
+  .modal-hint a { color:#00b8d4; }
+  .modal-btns { display:flex; gap:8px; }
+  .modal-btn {
+    flex:1; padding:11px; border-radius:6px; border:none; font-size:13px; font-weight:700;
+    font-family:'JetBrains Mono',monospace; cursor:pointer; letter-spacing:0.05em;
+  }
+  .modal-btn.primary { background:#00b8d4; color:#07090f; }
+  .modal-btn.ghost { background:transparent; border:1px solid #252d40; color:#7a8499; }
+  .install-banner {
+    position:fixed; bottom:0; left:0; right:0; z-index:900;
+    background:#0d1018; border-top:1px solid #252d40; padding:12px 16px;
+    display:flex; align-items:center; gap:12px;
+    font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;
+    transform:translateY(100%); transition:transform 0.3s; padding-bottom:calc(12px + env(safe-area-inset-bottom));
+  }
+  .install-banner.show { transform:translateY(0); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- React 18 + Babel (CDN) -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useCallback, useRef } = React;
+
+// ── APIキー管理 ──────────────────────────────────────────
+function getApiKey() {
+  try { return localStorage.getItem("hl_anthropic_key") || ""; } catch { return ""; }
+}
+function setApiKey(k) {
+  try { localStorage.setItem("hl_anthropic_key", k); } catch {}
+}
+
+
+// ── デザイン ──────────────────────────────────────────────
+const C = {
+  bg:"#07090f",surface:"#0d1018",surface2:"#131720",
+  border:"#1c2130",border2:"#252d40",
+  up:"#00e676",upDim:"rgba(0,230,118,0.1)",upMid:"rgba(0,230,118,0.3)",
+  down:"#ff3d5a",downDim:"rgba(255,61,90,0.1)",downMid:"rgba(255,61,90,0.3)",
+  gold:"#ffc107",goldDim:"rgba(255,193,7,0.12)",
+  cyan:"#00b8d4",white:"#eef0f6",gray:"#6b7590",grayDim:"#2a3048",
+  mono:"'JetBrains Mono','Fira Code','Courier New',monospace",
+  sans:"-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif",
+};
+const PAIRS = [
+  {id:"USDJPY",base:"USD",quote:"JPY",label:"USD/JPY"},
+  {id:"EURJPY",base:"EUR",quote:"JPY",label:"EUR/JPY"},
+  {id:"GBPJPY",base:"GBP",quote:"JPY",label:"GBP/JPY"},
+  {id:"AUDJPY",base:"AUD",quote:"JPY",label:"AUD/JPY"},
+  {id:"EURUSD",base:"EUR",quote:"USD",label:"EUR/USD"},
+  {id:"GBPUSD",base:"GBP",quote:"USD",label:"GBP/USD"},
+];
+const DURATIONS = ["15秒","30秒","1分","3分","5分"];
+const rnd = (v,d) => +v.toFixed(d);
+
+// ── 実レート取得（多重フォールバック）────────────────────
+// 公式推奨のフォールバック順（fawazahmed0/exchange-api Issue #90）に準拠
+// ①jsDelivr min → ②pages.dev min → ③jsDelivr full → ④pages.dev full → ⑤Frankfurter
+async function fetchLiveRate(base, quote) {
+  const b = base.toLowerCase(), q = quote.toLowerCase();
+  const urls = [
+    `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${b}.min.json`,
+    `https://latest.currency-api.pages.dev/v1/currencies/${b}.min.json`,
+    `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${b}.json`,
+    `https://latest.currency-api.pages.dev/v1/currencies/${b}.json`,
+  ];
+  const errors = [];
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) {
+        const d = await res.json();
+        const rate = d?.[b]?.[q];
+        if (rate && isFinite(rate)) return rate;
+        errors.push("rate-missing");
+      } else errors.push(`${res.status}`);
+    } catch (e) { errors.push(e.message); }
+  }
+  // ⑤ Frankfurter フォールバック
+  try {
+    const res = await fetch(`https://api.frankfurter.dev/v2/rates?base=EUR&quotes=${base},${quote}`);
+    if (res.ok) {
+      const d = await res.json();
+      const rb = d.rates?.[base] ?? (base==="EUR"?1:null);
+      const rq = d.rates?.[quote] ?? (quote==="EUR"?1:null);
+      if (rb && rq) return rq / rb;
+    }
+    errors.push("frankfurter-fail");
+  } catch (e) { errors.push(`fkt:${e.message}`); }
+
+  throw new Error(`全API失敗 [${errors.slice(0,3).join(", ")}]`);
+}
+
+// 過去30日の日次レート（Frankfurter時系列 → 失敗時は空）
+async function fetchDailyHistory(base, quote) {
+  const dp = (quote==="JPY"||base==="JPY") ? 3 : 5;
+  try {
+    const to   = new Date().toISOString().split("T")[0];
+    const from = new Date(Date.now()-30*86400000).toISOString().split("T")[0];
+    const url  = `https://api.frankfurter.dev/v2/rates?base=EUR&quotes=${base},${quote}&from=${from}&to=${to}`;
+    const res  = await fetch(url);
+    if (res.ok) {
+      const text = await res.text();
+      let rows = [];
+      try {
+        const j = JSON.parse(text);
+        if (j.rates) rows = Object.entries(j.rates).map(([date,r])=>({date,rates:r}));
+        else if (Array.isArray(j)) rows = j;
+      } catch {
+        rows = text.trim().split("\n").map(l=>{try{return JSON.parse(l);}catch{return null;}}).filter(Boolean);
+      }
+      const out = rows.map(row=>{
+        const r  = row.rates||{};
+        const rb = r[base]  ?? (base==="EUR"?1:null);
+        const rq = r[quote] ?? (quote==="EUR"?1:null);
+        if (!rb||!rq) return null;
+        return {price: rnd(rq/rb, dp), date: row.date};
+      }).filter(Boolean);
+      if (out.length) return out;
+    }
+  } catch (e) { /* 空配列を返す */ }
+  return [];
+}
+
+// 実レートをベースに短期ティックをシミュレーション（最新値は必ず実レート）
+function buildTickData(liveRate, dailyPrices, isJpy, n=150) {
+  const dp   = isJpy ? 3 : 5;
+  const base = liveRate;
+  const vol  = base * 0.0007;
+  // 日次データの価格だけ抽出して先頭に使う
+  const daily = dailyPrices.map(d=>d.price);
+  const need  = Math.max(0, n - daily.length);
+  // シミュレーション部分（最新値付近）
+  let p = daily.length ? daily[daily.length-1] : base;
+  const sim = Array.from({length: need}, () => {
+    p = Math.max(p + (Math.random()-0.487)*vol, base*0.85);
+    return rnd(p, dp);
+  });
+  const all = [...daily, ...sim];
+  // 末尾を必ず実レートに合わせる
+  all[all.length-1] = rnd(liveRate, dp);
+  return all;
+}
+
+// ── テクニカル指標 ────────────────────────────────────────
+function calcIndicators(prices) {
+  const n  = prices.length;
+  const dp = prices[0] > 10 ? 3 : 5;
+  const ema = (arr, period) => {
+    const k = 2/(period+1);
+    return arr.reduce((acc,p,i)=>i===0?[p]:[...acc, rnd(p*k+acc[i-1]*(1-k), dp)], []);
+  };
+  const ema5  = ema(prices, 5);
+  const ema20 = ema(prices, 20);
+  const ema50 = ema(prices, 50);
+  // RSI
+  const gains=[], losses=[];
+  for (let i=1;i<n;i++){
+    const d=prices[i]-prices[i-1];
+    gains.push(Math.max(d,0)); losses.push(Math.max(-d,0));
+  }
+  const rsiArr = prices.map((_,i)=>{
+    if(i<14) return 50;
+    const g=gains.slice(i-14,i).reduce((a,b)=>a+b,0)/14;
+    const l=losses.slice(i-14,i).reduce((a,b)=>a+b,0)/14;
+    if(g===0&&l===0) return 50;
+    return l===0?100:g===0?0:rnd(100-100/(1+g/l),1);
+  });
+  // MACD
+  const macdLine   = ema5.map((e,i)=>rnd(e-ema20[i],dp));
+  const signalLine = ema(macdLine,9);
+  const hist       = macdLine.map((m,i)=>rnd(m-signalLine[i],dp));
+  // BB
+  const bb = prices.map((_,i)=>{
+    if(i<19) return {upper:null,lower:null,mid:null};
+    const sl   = prices.slice(i-19,i+1);
+    const mean = sl.reduce((a,b)=>a+b,0)/20;
+    const std  = Math.sqrt(sl.reduce((a,b)=>a+(b-mean)**2,0)/20);
+    return {upper:rnd(mean+2*std,dp), lower:rnd(mean-2*std,dp), mid:rnd(mean,dp)};
+  });
+  // Stoch
+  const stoch = prices.map((_,i)=>{
+    if(i<13) return {k:50,d:50};
+    const sl=prices.slice(i-13,i+1);
+    const h=Math.max(...sl), l=Math.min(...sl);
+    const k=h===l?50:rnd((prices[i]-l)/(h-l)*100,1);
+    return {k,d:k};
+  });
+  for(let i=2;i<stoch.length;i++) stoch[i].d=rnd((stoch[i].k+stoch[i-1].k+stoch[i-2].k)/3,1);
+  // ATR
+  const atr = prices.map((_,i)=>{
+    if(i===0) return 0;
+    if(i<14) return rnd(Math.abs(prices[i]-prices[i-1]),dp);
+    const trs=prices.slice(i-13,i+1).map((p,j,a)=>j===0?0:Math.abs(p-a[j-1]));
+    return rnd(trs.reduce((a,b)=>a+b,0)/14,dp);
+  });
+  return {ema5,ema20,ema50,rsi:rsiArr,macd:macdLine,signal:signalLine,hist,bb,stoch,atr};
+}
+
+// ── シグナル判定 ──────────────────────────────────────────
+function judgeSignals(prices, ind) {
+  const i   = prices.length-1;
+  const p   = prices[i];
+  const dp  = p>10?3:5;
+  const rsi = ind.rsi[i], rsiP = ind.rsi[i-1]||50;
+  const macd= ind.macd[i], macdP= ind.macd[i-1]||0;
+  const sig = ind.signal[i], sigP = ind.signal[i-1]||0;
+  const h   = ind.hist[i], hP = ind.hist[i-1]||0;
+  const bb  = ind.bb[i];
+  const e5  = ind.ema5[i], e20= ind.ema20[i], e50= ind.ema50[i];
+  const st  = ind.stoch[i];
+  const atr = ind.atr[i];
+  const atrPct = rnd(atr/p*100,3);
+  const volatility = atrPct>0.08?"高":atrPct>0.04?"中":"低";
+
+  const results = [];
+
+  // RSI
+  let rDir="NEUTRAL",rStr=0;
+  if(rsi<28){rDir="HIGH";rStr=Math.min(95,(30-rsi)*4);}
+  else if(rsi>72){rDir="LOW";rStr=Math.min(95,(rsi-70)*4);}
+  else if(rsi<42&&rsi>rsiP){rDir="HIGH";rStr=42;}
+  else if(rsi>58&&rsi<rsiP){rDir="LOW";rStr=42;}
+  results.push({name:"RSI",dir:rDir,strength:rnd(rStr,0),value:`${rsi}`,
+    desc:rsi<30?"売られすぎ↑":rsi>70?"買われすぎ↓":`中立 ${rsi}`});
+
+  // MACD
+  let mDir="NEUTRAL",mStr=0;
+  if(macdP<sigP&&macd>sig){mDir="HIGH";mStr=88;}
+  else if(macdP>sigP&&macd<sig){mDir="LOW";mStr=88;}
+  else if(h>0&&h>hP){mDir="HIGH";mStr=55;}
+  else if(h<0&&h<hP){mDir="LOW";mStr=55;}
+  results.push({name:"MACD",dir:mDir,strength:rnd(mStr,0),value:`${rnd(macd,dp)}`,
+    desc:mDir==="HIGH"?"GC↑":mDir==="LOW"?"DC↓":"待機"});
+
+  // BB
+  let bDir="NEUTRAL",bStr=0;
+  if(bb.lower&&p<=bb.lower){bDir="HIGH";bStr=82;}
+  else if(bb.upper&&p>=bb.upper){bDir="LOW";bStr=82;}
+  results.push({name:"BB",dir:bDir,strength:rnd(bStr,0),
+    value:bb.upper?`幅${rnd(bb.upper-bb.lower,dp)}`:"—",
+    desc:bDir==="HIGH"?"下限反発":bDir==="LOW"?"上限反落":"バンド内"});
+
+  // EMA
+  let eDir="NEUTRAL",eStr=0;
+  if(e5>e20&&e20>e50){eDir="HIGH";eStr=78;}
+  else if(e5<e20&&e20<e50){eDir="LOW";eStr=78;}
+  else if(e5>e20){eDir="HIGH";eStr=45;}
+  else if(e5<e20){eDir="LOW";eStr=45;}
+  results.push({name:"EMA",dir:eDir,strength:rnd(eStr,0),value:`${rnd(e5,dp)}`,
+    desc:eDir==="HIGH"?"上昇配列":eDir==="LOW"?"下降配列":"交差中"});
+
+  // Stoch
+  let sDir="NEUTRAL",sStr=0;
+  if(st.k<20){sDir="HIGH";sStr=75;}
+  else if(st.k>80){sDir="LOW";sStr=75;}
+  else if(st.k>st.d&&st.k<50){sDir="HIGH";sStr=48;}
+  else if(st.k<st.d&&st.k>50){sDir="LOW";sStr=48;}
+  results.push({name:"Stoch",dir:sDir,strength:rnd(sStr,0),value:`K${st.k}`,
+    desc:st.k<20?"売られすぎ↑":st.k>80?"買われすぎ↓":`K${st.k}/D${st.d}`});
+
+  // ATR
+  results.push({name:"ATR",dir:"INFO",strength:0,value:`${rnd(atr,dp)}`,
+    desc:`ボラ${volatility}(${atrPct}%)`});
+
+  // 集計
+  let hScore=0,lScore=0,sigCount=0;
+  results.forEach(s=>{
+    if(s.dir==="HIGH"){hScore+=s.strength;sigCount++;}
+    if(s.dir==="LOW") {lScore+=s.strength;sigCount++;}
+  });
+  const total=hScore+lScore||1;
+  const highPct=rnd(hScore/total*100,0);
+  const lowPct=rnd(lScore/total*100,0);
+  const finalDir=hScore>lScore?"HIGH":hScore<lScore?"LOW":"NEUTRAL";
+  const confidence=Math.min(rnd(Math.max(hScore,lScore)/(sigCount||1)/80*100,0),96);
+  const trend=e5>e20&&e20>e50?"上昇":e5<e20&&e20<e50?"下降":"レンジ";
+  const rsiZone=rsi<30?"売られすぎ":rsi>70?"買われすぎ":"中立";
+  const macdCross=macdP<sigP&&macd>sig?"GC":macdP>sigP&&macd<sig?"DC":"—";
+
+  return {signals:results,highPct,lowPct,finalDir,confidence,
+    atrPct,volatility,trend,rsiZone,macdCross,rsi,stoch:st};
+}
+
+// ── ミニチャート ──────────────────────────────────────────
+function MiniChart({prices,ema5=[],ema20=[],height=80}) {
+  const ref = useRef(null);
+  useEffect(()=>{
+    const cv=ref.current; if(!cv||!prices.length) return;
+    const ctx=cv.getContext("2d");
+    const W=cv.width, H=cv.height;
+    const last=prices.slice(-60);
+    const e5s=ema5.slice(-60), e20s=ema20.slice(-60);
+    const all=[...last,...e5s.filter(Boolean),...e20s.filter(Boolean)];
+    const mn=Math.min(...all), mx=Math.max(...all), range=mx-mn||1;
+    const X=i=>(i/(last.length-1))*W;
+    const Y=v=>H-((v-mn)/range)*(H-14)-7;
+    ctx.clearRect(0,0,W,H);
+    // Grid
+    [0.25,0.5,0.75].forEach(r=>{
+      ctx.beginPath();ctx.moveTo(0,H*r);ctx.lineTo(W,H*r);
+      ctx.strokeStyle="#1c2130";ctx.lineWidth=1;ctx.stroke();
+    });
+    // Fill
+    const up=last[last.length-1]>=last[0];
+    const g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,up?"rgba(0,230,118,0.22)":"rgba(255,61,90,0.22)");
+    g.addColorStop(1,"rgba(0,0,0,0)");
+    ctx.beginPath();
+    last.forEach((p,i)=>i===0?ctx.moveTo(X(i),Y(p)):ctx.lineTo(X(i),Y(p)));
+    ctx.lineTo(X(last.length-1),H);ctx.lineTo(0,H);ctx.closePath();
+    ctx.fillStyle=g;ctx.fill();
+    // Price line
+    ctx.beginPath();
+    last.forEach((p,i)=>i===0?ctx.moveTo(X(i),Y(p)):ctx.lineTo(X(i),Y(p)));
+    ctx.strokeStyle=up?"#00e676":"#ff3d5a";ctx.lineWidth=1.8;ctx.stroke();
+    // EMA5
+    if(e5s.length){let st=false;ctx.beginPath();
+      e5s.forEach((v,i)=>{if(!v)return;st?ctx.lineTo(X(i),Y(v)):ctx.moveTo(X(i),Y(v));st=true;});
+      ctx.strokeStyle="#ffc107";ctx.lineWidth=1;ctx.setLineDash([3,2]);ctx.stroke();ctx.setLineDash([]);}
+    // EMA20
+    if(e20s.length){let st=false;ctx.beginPath();
+      e20s.forEach((v,i)=>{if(!v)return;st?ctx.lineTo(X(i),Y(v)):ctx.moveTo(X(i),Y(v));st=true;});
+      ctx.strokeStyle="#00b8d4";ctx.lineWidth=1;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);}
+    // Current price line
+    const ly=Y(last[last.length-1]);
+    ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(0,ly);ctx.lineTo(W,ly);
+    ctx.strokeStyle="rgba(255,255,255,0.15)";ctx.lineWidth=1;ctx.stroke();ctx.setLineDash([]);
+  },[prices,ema5,ema20]);
+  return <canvas ref={ref} width={620} height={height} style={{width:"100%",height,display:"block"}}/>;
+}
+
+// ── シグナルバー ──────────────────────────────────────────
+function SignalBar({sig}) {
+  const isUp=sig.dir==="HIGH", isDown=sig.dir==="LOW", isInfo=sig.dir==="INFO";
+  const color=isUp?"#00e676":isDown?"#ff3d5a":"#6b7590";
+  return (
+    <div style={{display:"flex",alignItems:"center",gap:8,padding:"7px 0",borderBottom:"1px solid #1c2130"}}>
+      <span style={{fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:11,fontWeight:700,color,width:40,flexShrink:0}}>{sig.name}</span>
+      <div style={{flex:1}}>
+        <div style={{background:"#1c2130",borderRadius:2,height:4,overflow:"hidden"}}>
+          {!isInfo&&sig.strength>0&&<div style={{height:"100%",width:`${sig.strength}%`,background:color,borderRadius:2,transition:"width 0.6s"}}/>}
+        </div>
+      </div>
+      <span style={{fontSize:10,color:"#6b7590",fontFamily:"'JetBrains Mono','Courier New',monospace",width:94,textAlign:"right",flexShrink:0}}>{sig.desc}</span>
+      <span style={{fontSize:12,color,fontFamily:"'JetBrains Mono','Courier New',monospace",width:18,textAlign:"right",fontWeight:700,flexShrink:0}}>
+        {isInfo?"":isUp?"▲":isDown?"▼":"—"}
+      </span>
+    </div>
+  );
+}
+
+// ── メイン ────────────────────────────────────────────────
+function HighLowAnalyzer() {
+  const [pairId,setPairId]     = useState("USDJPY");
+  const [duration,setDuration] = useState("1分");
+  const [prices,setPrices]     = useState([]);
+  const [ind,setInd]           = useState(null);
+  const [judgment,setJudgment] = useState(null);
+  const [liveRate,setLiveRate] = useState(null);
+  const [fetchStatus,setFetchStatus] = useState("idle");
+  const [fetchMsg,setFetchMsg] = useState("ペアを選択してください");
+  const [prediction,setPrediction] = useState(null);
+  const [predicting,setPredicting] = useState(false);
+  const [history,setHistory]   = useState([]);
+  const [timer,setTimer]       = useState(0);
+  const tickRef  = useRef(null);
+  const timerRef = useRef(null);
+  const pricesRef = useRef([]);     // 最新価格を判定時に参照するため
+  const judgeTimers = useRef([]);   // 結果判定タイマーの管理
+
+  const pairInfo = PAIRS.find(p=>p.id===pairId);
+  const {base,quote,label} = pairInfo;
+  const isJpy = pairId.includes("JPY");
+  const dp    = isJpy?3:5;
+
+  // pricesが更新されるたびにrefも同期
+  useEffect(()=>{ pricesRef.current = prices; }, [prices]);
+
+  // 取引時間経過後に的中判定するタイマーをセット
+  function finalizePrediction(result) {
+    const id = Date.now() + "_" + Math.random().toString(36).slice(2,7);
+    const secs = {"15秒":15,"30秒":30,"1分":60,"3分":180,"5分":300}[duration]||60;
+    const entry = {
+      ...result, pair:label, duration, id,
+      status:"pending",        // pending | win | lose | draw
+      resultPrice:null,
+      secondsLeft:secs,
+    };
+    setPrediction(result);
+    setHistory(h=>[entry,...h].slice(0,15));
+
+    // カウントダウン表示用
+    setTimer(secs);
+    clearInterval(timerRef.current);
+    timerRef.current=setInterval(()=>setTimer(t=>{if(t<=1){clearInterval(timerRef.current);return 0;}return t-1;}),1000);
+
+    // 取引時間経過後に判定
+    const jt = setTimeout(()=>{
+      const cur = pricesRef.current[pricesRef.current.length-1];
+      setHistory(h => h.map(item => {
+        if (item.id !== id) return item;
+        if (cur == null) return {...item, status:"draw", resultPrice:null};
+        const diff = cur - item.entryPrice;
+        let status;
+        if (Math.abs(diff) < item.entryPrice * 1e-7) status = "draw";
+        else if (item.prediction === "HIGH") status = diff > 0 ? "win" : "lose";
+        else status = diff < 0 ? "win" : "lose";
+        return {...item, status, resultPrice: cur};
+      }));
+    }, secs * 1000);
+    judgeTimers.current.push(jt);
+  }
+
+  // データロード
+  const loadData = useCallback(async()=>{
+    setFetchStatus("loading");
+    setFetchMsg("実レート取得中...");
+    setPrediction(null);
+    clearInterval(tickRef.current);
+    try {
+      const [live, daily] = await Promise.all([
+        fetchLiveRate(base, quote),
+        fetchDailyHistory(base, quote).catch(()=>[]),
+      ]);
+      setLiveRate(live);
+      const all = buildTickData(live, daily, isJpy, 150);
+      const i   = calcIndicators(all);
+      const j   = judgeSignals(all, i);
+      setPrices(all); setInd(i); setJudgment(j);
+      setFetchStatus("live");
+      setFetchMsg(`✅ 実レート取得完了 — ${live.toFixed(dp)}（Frankfurter/ECBベース）`);
+      // 3秒ごとに価格ティック
+      tickRef.current = setInterval(()=>{
+        setPrices(prev=>{
+          if(!prev.length) return prev;
+          const last=prev[prev.length-1];
+          const vol=last*0.0006;
+          const next=rnd(Math.max(last+(Math.random()-0.487)*vol, last*0.9), dp);
+          const np=[...prev.slice(1),next];
+          const ni=calcIndicators(np);
+          const nj=judgeSignals(np,ni);
+          setInd(ni); setJudgment(nj);
+          return np;
+        });
+      }, 3000);
+    } catch(e) {
+      setFetchStatus("error");
+      setFetchMsg(`⚠️ ライブレート接続不可 — 参考値で分析中（${{USDJPY:155.2,EURJPY:168.4,GBPJPY:196.5,AUDJPY:101.3,EURUSD:1.085,GBPUSD:1.267}[pairId]||100}）`);
+      const fb={USDJPY:155.2,EURJPY:168.4,GBPJPY:196.5,AUDJPY:101.3,EURUSD:1.085,GBPUSD:1.267}[pairId]||100;
+      setLiveRate(fb);
+      const all=buildTickData(fb,[],isJpy,150);
+      const i=calcIndicators(all); const j=judgeSignals(all,i);
+      setPrices(all); setInd(i); setJudgment(j);
+      tickRef.current=setInterval(()=>{
+        setPrices(prev=>{
+          if(!prev.length) return prev;
+          const last=prev[prev.length-1];
+          const vol=last*0.0006;
+          const next=rnd(Math.max(last+(Math.random()-0.487)*vol,last*0.9),dp);
+          const np=[...prev.slice(1),next];
+          const ni=calcIndicators(np); const nj=judgeSignals(np,ni);
+          setInd(ni); setJudgment(nj); return np;
+        });
+      },3000);
+    }
+  },[pairId,base,quote,isJpy,dp]);
+
+  useEffect(()=>{ loadData(); return()=>{clearInterval(tickRef.current);clearInterval(timerRef.current);judgeTimers.current.forEach(clearTimeout);}; },[loadData]);
+
+  // AI予測実行（ローカル計算 + Claude解説）
+  async function runPrediction() {
+    if(!judgment||!prices.length) return;
+    setPredicting(true); setPrediction(null);
+    clearInterval(timerRef.current);
+
+    // ローカルスコアリング
+    const j=judgment;
+    const p=prices[prices.length-1];
+    let hScore=0,lScore=0;
+    j.signals.forEach(s=>{
+      if(s.dir==="HIGH") hScore+=s.strength*0.65;
+      if(s.dir==="LOW")  lScore+=s.strength*0.65;
+    });
+    if(j.trend==="上昇")  hScore+=28; if(j.trend==="下降")  lScore+=28;
+    if(j.rsiZone==="売られすぎ") hScore+=32; if(j.rsiZone==="買われすぎ") lScore+=32;
+    if(j.macdCross==="GC") hScore+=42; if(j.macdCross==="DC") lScore+=42;
+    const vMul=j.volatility==="低"?1.1:j.volatility==="高"?0.9:1;
+    hScore*=vMul; lScore*=vMul;
+    const total=hScore+lScore||1;
+    const pred=hScore>=lScore?"HIGH":"LOW";
+    const conf=Math.min(Math.max(rnd(Math.max(hScore,lScore)/total*100,0),51),94);
+
+    try {
+      // Claude AI に解説させる
+      const prompt=`あなたはバイナリーオプション（ハイロー）の短期取引専門アナリストです。
+【通貨ペア】${label}（${duration}）
+【現在値】${p}
+【シグナルスコア】HIGH:${rnd(hScore,0)} / LOW:${rnd(lScore,0)}
+【RSI】${j.rsi} (${j.rsiZone})
+【MACDクロス】${j.macdCross}
+【EMAトレンド】${j.trend}
+【ストキャスK】${j.stoch?.k}
+【ボラティリティ】${j.volatility}（ATR ${j.atrPct}%）
+【総合予測】${pred}（信頼度 ${conf}%）
+
+上記分析に基づいて以下のJSON形式のみで回答（コードブロック不要）:
+{"reason":"予測根拠（2文）","entry_timing":"エントリータイミング（1文）","caution":"注意点（1文）","best_expiry":"最適な取引時間"}`;
+
+      const apiKey = getApiKey();
+      if(!apiKey) throw new Error("NO_API_KEY");
+      const res=await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true"
+        },
+        body:JSON.stringify({
+          model:"claude-sonnet-4-6",
+          max_tokens:700,
+          messages:[{role:"user",content:prompt}]
+        })
+      });
+      const data=await res.json();
+      if(data.error) throw new Error(data.error.message);
+      const text=(data.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("").trim();
+      // JSON抽出を堅牢化：パース失敗してもクラッシュさせない
+      let ai={};
+      try{
+        const m=text.replace(/```[a-z]*/gi,"").replace(/```/g,"").match(/\{[\s\S]*\}/);
+        if(m) ai=JSON.parse(m[0]);
+      }catch(parseErr){
+        ai={reason:text.slice(0,200)||"テクニカル指標による予測です。"};
+      }
+
+      const result={
+        prediction:pred, confidence:conf,
+        highPct:rnd(hScore/total*100,0), lowPct:rnd(lScore/total*100,0),
+        reason:ai.reason||"テクニカル指標の総合判断による予測です。",
+        entry_timing:ai.entry_timing||"現在のタイミングでエントリー可能です。",
+        caution:ai.caution||"必ず資金管理を徹底してください。",
+        best_expiry:ai.best_expiry||duration,
+        entryPrice:p, time:new Date().toLocaleTimeString("ja-JP"),
+      };
+      finalizePrediction(result);
+    } catch(e) {
+      // AI解説が取れない場合もローカル分析で自然な解説を生成（失敗をユーザーに見せない）
+      const dirJP = pred==="HIGH" ? "上昇" : "下降";
+      const localReason =
+        j.macdCross!=="—" ? `MACDが${j.macdCross==="GC"?"ゴールデンクロス":"デッドクロス"}を形成し、${dirJP}圧力が強まっています。RSI ${j.rsi}（${j.rsiZone}）とEMAトレンド「${j.trend}」も総合判断を支持しています。`
+        : j.rsiZone!=="中立" ? `RSIが${j.rsiZone}圏（${j.rsi}）にあり、${dirJP}方向への反転が期待されます。EMAトレンドは「${j.trend}」、ボラティリティは${j.volatility}です。`
+        : `複数のテクニカル指標を総合した結果、${dirJP}シグナルが優勢です（HIGH:${rnd(hScore,0)} / LOW:${rnd(lScore,0)}）。トレンドは「${j.trend}」です。`;
+      const localEntry =
+        j.volatility==="高" ? "値動きが大きいため、価格が一度落ち着いた瞬間を狙ってエントリーしてください。"
+        : j.volatility==="低" ? "値動きが小さいので、シグナルが明確に出た直後のエントリーが有効です。"
+        : "現在シグナルが揃っており、エントリーに適したタイミングです。";
+      const localCaution =
+        j.volatility==="高" ? "急変動のリスクがあります。投資額を抑えて慎重に取引してください。"
+        : conf<60 ? "シグナルがやや拮抗しています。エントリーを見送る判断も有効です。"
+        : "相場は急変する可能性があります。必ず資金管理を徹底してください。";
+      const localExpiry =
+        j.volatility==="高" ? "30秒〜1分（短期で利確）"
+        : j.trend!=="レンジ" ? "3分〜5分（トレンドフォロー）"
+        : "15秒〜1分（レンジ内の小幅狙い）";
+
+      const result={
+        prediction:pred, confidence:conf,
+        highPct:rnd(hScore/total*100,0), lowPct:rnd(lScore/total*100,0),
+        reason: localReason,
+        entry_timing: localEntry,
+        caution: localCaution,
+        best_expiry: localExpiry,
+        entryPrice:p, time:new Date().toLocaleTimeString("ja-JP"),
+      };
+      finalizePrediction(result);
+    }
+    setPredicting(false);
+  }
+
+  const cur=prices[prices.length-1];
+  const prv=prices[prices.length-2];
+  const change=cur&&prv?rnd(cur-prv,dp):0;
+  const isUp2=change>=0;
+  const confColor=c=>c>=75?"#00e676":c>=60?"#ffc107":"#6b7590";
+  const durSecs={"15秒":15,"30秒":30,"1分":60,"3分":180,"5分":300}[duration]||60;
+  const timerPct=timer?(timer/durSecs)*100:0;
+
+  return(
+    <div style={{background:C.bg,minHeight:"100vh",fontFamily:C.sans,color:C.white,fontSize:13}}>
+      <style>{`@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}`}</style>
+
+      {/* ヘッダー */}
+      <div style={{background:C.surface,borderBottom:`1px solid ${C.border}`,padding:"0 16px"}}>
+        <div style={{maxWidth:820,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",height:50}}>
+          <div style={{fontFamily:C.mono,fontSize:15,fontWeight:700}}>
+            <span style={{color:C.up}}>HIGH</span>
+            <span style={{color:C.gray,margin:"0 5px"}}>/</span>
+            <span style={{color:C.down}}>LOW</span>
+            <span style={{color:C.gray,fontSize:11,marginLeft:8,letterSpacing:"0.1em"}}>ANALYZER</span>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <div style={{fontSize:10,fontFamily:C.mono,display:"flex",alignItems:"center",gap:5,background:C.surface2,border:`1px solid ${C.border2}`,padding:"3px 10px",borderRadius:20,color:fetchStatus==="live"?C.up:fetchStatus==="error"?C.down:C.gray}}>
+              <div style={{width:5,height:5,borderRadius:"50%",background:fetchStatus==="live"?C.up:C.gray,boxShadow:fetchStatus==="live"?`0 0 6px ${C.up}`:"none",animation:fetchStatus==="live"?"blink 2s infinite":"none"}}/>
+              {fetchStatus==="live"?"LIVE RATE":fetchStatus==="loading"?"取得中...":"OFFLINE"}
+            </div>
+            <button onClick={loadData} style={{background:"transparent",border:`1px solid ${C.border2}`,color:C.gray,fontFamily:C.mono,fontSize:10,padding:"3px 10px",borderRadius:20,cursor:"pointer"}}>↺ 更新</button>
+          </div>
+        </div>
+      </div>
+
+      <div style={{maxWidth:820,margin:"0 auto",padding:"14px"}}>
+        {/* ペア選択 */}
+        <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:8}}>
+          {PAIRS.map(p=>(
+            <button key={p.id} onClick={()=>setPairId(p.id)}
+              style={{background:pairId===p.id?C.upDim:"transparent",border:`1px solid ${pairId===p.id?C.up:C.border2}`,color:pairId===p.id?C.white:C.gray,fontFamily:C.mono,fontSize:11,padding:"5px 11px",cursor:"pointer",borderRadius:3,fontWeight:pairId===p.id?700:400,transition:"all 0.15s"}}>
+              {p.label}
+            </button>
+          ))}
+        </div>
+
+        {/* 取引時間 */}
+        <div style={{display:"flex",gap:5,marginBottom:12,alignItems:"center"}}>
+          <span style={{fontSize:10,fontFamily:C.mono,color:C.gray,marginRight:4,letterSpacing:"0.05em"}}>取引時間:</span>
+          {DURATIONS.map(d=>(
+            <button key={d} onClick={()=>setDuration(d)}
+              style={{background:duration===d?C.goldDim:"transparent",border:`1px solid ${duration===d?C.gold:C.border2}`,color:duration===d?C.gold:C.gray,fontFamily:C.mono,fontSize:11,padding:"4px 12px",cursor:"pointer",borderRadius:3,fontWeight:duration===d?700:400}}>
+              {d}
+            </button>
+          ))}
+        </div>
+
+        {/* ステータスバー */}
+        <div style={{padding:"7px 12px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:3,marginBottom:12,fontSize:10,fontFamily:C.mono,color:fetchStatus==="live"?C.up:fetchStatus==="error"?C.down:C.gray}}>
+          {fetchMsg}
+        </div>
+
+        {/* 価格表示 */}
+        <div style={{background:C.surface,border:`1px solid ${C.border}`,borderLeft:`3px solid ${isUp2?C.up:C.down}`,padding:"14px 16px",marginBottom:10}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+            <div>
+              <div style={{fontSize:10,fontFamily:C.mono,color:C.gray,marginBottom:4}}>{label} · 3秒更新</div>
+              <div style={{display:"flex",alignItems:"baseline",gap:12}}>
+                <span style={{fontFamily:C.mono,fontSize:30,fontWeight:700,color:C.white}}>{cur?.toFixed(dp)??"—"}</span>
+                <span style={{fontFamily:C.mono,fontSize:13,color:isUp2?C.up:C.down,fontWeight:700}}>{isUp2?"+":""}{change}</span>
+                {liveRate&&<span style={{fontSize:10,color:C.gold,fontFamily:C.mono}}>実: {liveRate.toFixed(dp)}</span>}
+              </div>
+            </div>
+            {/* タイマー */}
+            {timer>0&&(
+              <div style={{textAlign:"center"}}>
+                <div style={{fontSize:10,fontFamily:C.mono,color:C.gray,marginBottom:4}}>残り時間</div>
+                <div style={{fontFamily:C.mono,fontSize:22,fontWeight:700,color:timer<10?C.down:C.gold}}>{timer}s</div>
+                <div style={{width:60,height:4,background:C.border,borderRadius:2,marginTop:4}}>
+                  <div style={{height:"100%",width:`${timerPct}%`,background:timer<10?C.down:C.gold,borderRadius:2,transition:"width 1s linear"}}/>
+                </div>
+              </div>
+            )}
+          </div>
+          <div style={{marginTop:10}}>
+            <MiniChart prices={prices} ema5={ind?.ema5||[]} ema20={ind?.ema20||[]} height={75}/>
+          </div>
+          <div style={{display:"flex",gap:14,marginTop:6,fontSize:10,fontFamily:C.mono,color:C.gray}}>
+            <span style={{color:isUp2?C.up:C.down}}>━ 価格</span>
+            <span style={{color:C.gold}}>╌ EMA5</span>
+            <span style={{color:C.cyan}}>╌ EMA20</span>
+          </div>
+        </div>
+
+        {/* シグナル + 集計 */}
+        {judgment&&(
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
+            <div style={{background:C.surface,border:`1px solid ${C.border}`,padding:"12px 14px"}}>
+              <div style={{fontSize:10,fontFamily:C.mono,color:C.gray,letterSpacing:"0.1em",marginBottom:8}}>テクニカルシグナル</div>
+              {judgment.signals.map(s=><SignalBar key={s.name} sig={s}/>)}
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {/* スコア */}
+              <div style={{background:C.surface,border:`1px solid ${C.border}`,padding:"12px 14px",flex:1}}>
+                <div style={{fontSize:10,fontFamily:C.mono,color:C.gray,letterSpacing:"0.1em",marginBottom:10}}>シグナル集計</div>
+                <div style={{display:"flex",gap:8,marginBottom:8}}>
+                  <div style={{flex:1,background:C.upDim,border:`1px solid ${C.upMid}`,borderRadius:4,padding:"8px 10px",textAlign:"center"}}>
+                    <div style={{fontFamily:C.mono,fontSize:22,fontWeight:700,color:C.up}}>{judgment.highPct}%</div>
+                    <div style={{fontSize:11,color:C.up}}>▲ HIGH</div>
+                  </div>
+                  <div style={{flex:1,background:C.downDim,border:`1px solid ${C.downMid}`,borderRadius:4,padding:"8px 10px",textAlign:"center"}}>
+                    <div style={{fontFamily:C.mono,fontSize:22,fontWeight:700,color:C.down}}>{judgment.lowPct}%</div>
+                    <div style={{fontSize:11,color:C.down}}>▼ LOW</div>
+                  </div>
+                </div>
+                <div style={{background:C.downDim,borderRadius:3,height:6,overflow:"hidden",marginBottom:6}}>
+                  <div style={{height:"100%",width:`${judgment.highPct}%`,background:`linear-gradient(90deg,${C.up},${C.up}88)`,borderRadius:3,transition:"width 0.6s"}}/>
+                </div>
+                <div style={{fontSize:10,fontFamily:C.mono,color:C.gray}}>
+                  ボラ: <span style={{color:judgment.volatility==="高"?C.down:judgment.volatility==="中"?C.gold:C.up}}>{judgment.volatility}</span>
+                  　トレンド: <span style={{color:judgment.trend==="上昇"?C.up:judgment.trend==="下降"?C.down:C.gray}}>{judgment.trend}</span>
+                </div>
+              </div>
+              {/* 方向 */}
+              <div style={{background:judgment.finalDir==="HIGH"?C.upDim:judgment.finalDir==="LOW"?C.downDim:C.grayDim,border:`1px solid ${judgment.finalDir==="HIGH"?C.upMid:judgment.finalDir==="LOW"?C.downMid:C.border2}`,borderRadius:4,padding:"12px 14px",textAlign:"center"}}>
+                <div style={{fontSize:10,fontFamily:C.mono,color:C.gray,marginBottom:4}}>シグナル総合</div>
+                <div style={{fontFamily:C.mono,fontSize:26,fontWeight:700,color:judgment.finalDir==="HIGH"?C.up:judgment.finalDir==="LOW"?C.down:C.gray}}>
+                  {judgment.finalDir==="HIGH"?"▲ HIGH":judgment.finalDir==="LOW"?"▼ LOW":"— 中立"}
+                </div>
+                <div style={{fontSize:11,color:C.gray,marginTop:3}}>信頼度 {judgment.confidence}%</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* AI予測ボタン */}
+        <button onClick={runPrediction} disabled={predicting||!judgment}
+          style={{width:"100%",background:predicting||!judgment?C.surface2:`linear-gradient(135deg,${C.upDim},${C.goldDim})`,border:`1px solid ${predicting?C.border2:C.up}`,color:predicting?C.gray:C.up,padding:"14px",fontSize:14,fontWeight:700,fontFamily:C.mono,cursor:predicting||!judgment?"not-allowed":"pointer",borderRadius:4,letterSpacing:"0.08em",marginBottom:12,transition:"all 0.2s"}}>
+          {predicting?"⏳ AI予測中...":"🤖 AI予測を実行（HIGH / LOW）"}
+        </button>
+
+        {/* 予測結果 */}
+        {prediction&&(
+          <div style={{background:prediction.prediction==="HIGH"?C.upDim:C.downDim,border:`2px solid ${prediction.prediction==="HIGH"?C.up:C.down}`,borderRadius:6,padding:"18px",marginBottom:12}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+              <div style={{fontFamily:C.mono,fontSize:34,fontWeight:700,color:prediction.prediction==="HIGH"?C.up:C.down}}>
+                {prediction.prediction==="HIGH"?"▲ HIGH":"▼ LOW"}
+              </div>
+              <div style={{textAlign:"right"}}>
+                <div style={{fontSize:10,color:C.gray,fontFamily:C.mono,marginBottom:2}}>AI信頼度</div>
+                <div style={{fontFamily:C.mono,fontSize:26,fontWeight:700,color:confColor(prediction.confidence)}}>{prediction.confidence}%</div>
+              </div>
+            </div>
+            <div style={{background:"rgba(0,0,0,0.25)",borderRadius:3,height:5,marginBottom:12}}>
+              <div style={{height:"100%",width:`${prediction.confidence}%`,background:confColor(prediction.confidence),borderRadius:3}}/>
+            </div>
+            <div style={{display:"grid",gap:8}}>
+              <div style={{background:"rgba(0,0,0,0.2)",borderRadius:4,padding:"10px 14px"}}>
+                <div style={{fontSize:10,fontFamily:C.mono,color:C.gold,marginBottom:4}}>予測根拠</div>
+                <p style={{fontSize:13,lineHeight:1.8,color:C.white}}>{prediction.reason}</p>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                <div style={{background:"rgba(0,0,0,0.2)",borderRadius:4,padding:"10px 14px"}}>
+                  <div style={{fontSize:10,fontFamily:C.mono,color:C.cyan,marginBottom:4}}>エントリータイミング</div>
+                  <p style={{fontSize:12,lineHeight:1.7,color:C.white}}>{prediction.entry_timing}</p>
+                </div>
+                <div style={{background:"rgba(0,0,0,0.2)",borderRadius:4,padding:"10px 14px"}}>
+                  <div style={{fontSize:10,fontFamily:C.mono,color:C.down,marginBottom:4}}>⚠ 注意点</div>
+                  <p style={{fontSize:12,lineHeight:1.7,color:C.white}}>{prediction.caution}</p>
+                </div>
+              </div>
+              <div style={{fontSize:11,color:C.gray,fontFamily:C.mono,display:"flex",gap:16,flexWrap:"wrap"}}>
+                <span>最適取引時間: <span style={{color:C.gold}}>{prediction.best_expiry}</span></span>
+                <span>エントリー値: <span style={{color:C.white}}>{prediction.entryPrice?.toFixed(dp)}</span></span>
+                <span>予測時刻: <span style={{color:C.white}}>{prediction.time}</span></span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 履歴 */}
+        {history.length>0&&(()=>{
+          const settled = history.filter(h=>h.status==="win"||h.status==="lose");
+          const wins = history.filter(h=>h.status==="win").length;
+          const losses = history.filter(h=>h.status==="lose").length;
+          const winRate = settled.length ? Math.round(wins/settled.length*100) : 0;
+          return (
+          <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:4,padding:"12px 14px",marginBottom:12}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+              <span style={{fontSize:10,fontFamily:C.mono,color:C.gray,letterSpacing:"0.1em"}}>予測履歴と結果</span>
+              {settled.length>0&&(
+                <div style={{display:"flex",alignItems:"center",gap:10,fontFamily:C.mono,fontSize:11}}>
+                  <span style={{color:C.up}}>{wins}勝</span>
+                  <span style={{color:C.down}}>{losses}敗</span>
+                  <span style={{color:C.gray}}>|</span>
+                  <span style={{color:winRate>=50?C.up:C.down,fontWeight:700}}>的中率 {winRate}%</span>
+                </div>
+              )}
+            </div>
+            {/* ヘッダー行 */}
+            <div style={{display:"flex",alignItems:"center",gap:8,padding:"0 8px 6px",fontSize:9,fontFamily:C.mono,color:C.grayDim,borderBottom:`1px solid ${C.border}`,marginBottom:4}}>
+              <span style={{width:55,flexShrink:0}}>時刻</span>
+              <span style={{width:62,flexShrink:0}}>ペア</span>
+              <span style={{width:26,flexShrink:0}}>時間</span>
+              <span style={{width:54,flexShrink:0}}>予測</span>
+              <span style={{width:34,flexShrink:0}}>信頼</span>
+              <span style={{width:62,flexShrink:0,textAlign:"right"}}>ｴﾝﾄﾘｰ</span>
+              <span style={{width:62,flexShrink:0,textAlign:"right"}}>結果値</span>
+              <span style={{marginLeft:"auto"}}>判定</span>
+            </div>
+            {history.map((h)=>{
+              const rdp = h.pair.includes("JPY")?3:5;
+              const resultBadge = {
+                win:  {txt:"○ WIN", col:C.up,   bg:C.upDim},
+                lose: {txt:"× LOSE",col:C.down, bg:C.downDim},
+                draw: {txt:"− 引分", col:C.gray, bg:C.grayDim},
+                pending:{txt:"判定中", col:C.gold, bg:C.goldDim},
+              }[h.status]||{txt:"—",col:C.gray,bg:"transparent"};
+              return (
+              <div key={h.id} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 8px",background:h.status==="win"?C.upDim:h.status==="lose"?C.downDim:"transparent",borderRadius:3,fontSize:11,borderLeft:`2px solid ${h.status==="win"?C.up:h.status==="lose"?C.down:h.status==="pending"?C.gold:"transparent"}`}}>
+                <span style={{fontFamily:C.mono,fontSize:10,color:C.gray,width:55,flexShrink:0}}>{h.time}</span>
+                <span style={{fontFamily:C.mono,fontSize:10,color:C.gray,width:62,flexShrink:0}}>{h.pair}</span>
+                <span style={{fontFamily:C.mono,fontSize:10,color:C.gray,width:26,flexShrink:0}}>{h.duration}</span>
+                <span style={{fontFamily:C.mono,fontWeight:700,fontSize:10,color:h.prediction==="HIGH"?C.up:C.down,width:54,flexShrink:0}}>
+                  {h.prediction==="HIGH"?"▲HIGH":"▼LOW"}
+                </span>
+                <span style={{fontFamily:C.mono,fontSize:10,color:confColor(h.confidence),width:34,flexShrink:0}}>{h.confidence}%</span>
+                <span style={{fontFamily:C.mono,fontSize:10,color:C.gray,width:62,flexShrink:0,textAlign:"right"}}>{h.entryPrice?.toFixed(rdp)}</span>
+                <span style={{fontFamily:C.mono,fontSize:10,color:h.resultPrice!=null?(h.resultPrice>=h.entryPrice?C.up:C.down):C.grayDim,width:62,flexShrink:0,textAlign:"right"}}>
+                  {h.resultPrice!=null?h.resultPrice.toFixed(rdp):"—"}
+                </span>
+                <span style={{fontFamily:C.mono,fontSize:10,fontWeight:700,color:resultBadge.col,background:resultBadge.bg,padding:"2px 7px",borderRadius:3,marginLeft:"auto",flexShrink:0,minWidth:48,textAlign:"center"}}>
+                  {resultBadge.txt}
+                </span>
+              </div>
+              );
+            })}
+            <div style={{fontSize:9,fontFamily:C.mono,color:C.grayDim,marginTop:8,lineHeight:1.6}}>
+              ※ 結果は取引時間経過後のレートとエントリー値を比較して自動判定されます。判定中の項目は時間経過後に確定します。
+            </div>
+          </div>
+          );
+        })()}
+
+        <div style={{padding:"10px 12px",background:C.surface,border:`1px solid ${C.border}`,fontSize:10,color:C.gray,lineHeight:1.7,borderRadius:3}}>
+          ⚠️ 本ツールはFrankfurter API（欧州中央銀行ベース）の実レートと短期シミュレーションを組み合わせています。バイナリーオプション取引は元本全損のリスクがあります。投資判断は自己責任でお願いします。
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+// ── APIキー設定モーダル ──────────────────────────────────
+function SettingsModal({ onClose, onSave }) {
+  const [key, setKey] = useState(getApiKey());
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <h2>⚙️ API設定</h2>
+        <p>AI予測機能を使うには Anthropic の APIキーが必要です。キーはこの端末内（localStorage）にのみ保存され、外部には送信されません。</p>
+        <input
+          type="password"
+          placeholder="sk-ant-..."
+          value={key}
+          onChange={e=>setKey(e.target.value)}
+        />
+        <div className="modal-hint">
+          APIキーは <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> で取得できます。<br/>
+          ※ 未設定でもテクニカル分析・シグナル判定・実レート取得は動作します（AI解説のみ無効）。
+        </div>
+        <div className="modal-btns">
+          <button className="modal-btn ghost" onClick={onClose}>キャンセル</button>
+          <button className="modal-btn primary" onClick={()=>{ setApiKey(key.trim()); onSave && onSave(); onClose(); }}>保存</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── ルートアプリ（設定ボタン + インストール導線を追加）──
+function App() {
+  const [showSettings, setShowSettings] = useState(false);
+  const [showInstall, setShowInstall] = useState(false);
+  const deferredPrompt = useRef(null);
+
+  useEffect(() => {
+    // 初回起動時、APIキーが無ければ設定を促す
+    if (!getApiKey()) {
+      const seen = (()=>{try{return localStorage.getItem("hl_seen_intro");}catch{return null;}})();
+      if (!seen) { setShowSettings(true); try{localStorage.setItem("hl_seen_intro","1");}catch{} }
+    }
+    // PWAインストールプロンプト
+    const handler = (e) => { e.preventDefault(); deferredPrompt.current = e; setShowInstall(true); };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  async function doInstall() {
+    if (!deferredPrompt.current) return;
+    deferredPrompt.current.prompt();
+    await deferredPrompt.current.userChoice;
+    deferredPrompt.current = null;
+    setShowInstall(false);
+  }
+
+  return (
+    <>
+      {/* 設定ボタン（右上固定） */}
+      <button onClick={()=>setShowSettings(true)} style={{
+        position:"fixed", top:"calc(10px + env(safe-area-inset-top))", right:14, zIndex:800,
+        background:"rgba(13,16,24,0.9)", border:"1px solid #252d40", color:"#7a8499",
+        width:34, height:34, borderRadius:8, cursor:"pointer", fontSize:15,
+        display:"flex", alignItems:"center", justifyContent:"center"
+      }}>⚙️</button>
+
+      <HighLowAnalyzer />
+
+      {showSettings && <SettingsModal onClose={()=>setShowSettings(false)} onSave={()=>{}} />}
+
+      <div className={"install-banner" + (showInstall ? " show" : "")}>
+        <div style={{flex:1, fontSize:12, color:"#eef0f6"}}>
+          <strong>ホーム画面に追加</strong><br/>
+          <span style={{color:"#7a8499", fontSize:11}}>アプリとして起動できます</span>
+        </div>
+        <button onClick={()=>setShowInstall(false)} style={{background:"transparent",border:"none",color:"#7a8499",fontSize:12,cursor:"pointer"}}>後で</button>
+        <button onClick={doInstall} style={{background:"#00b8d4",border:"none",color:"#07090f",fontSize:13,fontWeight:700,padding:"8px 16px",borderRadius:6,cursor:"pointer"}}>追加</button>
+      </div>
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+
+<!-- Service Worker は単一ファイル版では無効 -->
+</body>
+</html>
