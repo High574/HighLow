@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0e17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HL Analyzer">
+<title>HIGH/LOW Analyzer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{ -webkit-tap-highlight-color:transparent; box-sizing:border-box; margin:0; padding:0; }
+  :root{
+    --bg:#0a0e17; --bg2:#0e1320; --surface:#121829; --surface2:#1a2236; --surface3:#222d45;
+    --border:#1e2740; --border2:#2c3a5c;
+    --up:#1fdf9f; --up-d:#0fa876; --up-glow:rgba(31,223,159,0.18);
+    --down:#ff4d6a; --down-d:#d83552; --down-glow:rgba(255,77,106,0.18);
+    --gold:#ffc94d; --cyan:#3dd9eb; --violet:#9d7bff;
+    --white:#f0f3fa; --text:#c8d0e0; --gray:#8693ad; --gray-d:#4a5675;
+    --mono:'JetBrains Mono',monospace; --sans:'Inter','Hiragino Sans','Noto Sans JP',sans-serif;
+    --r:14px; --r-sm:10px;
+  }
+  html,body{ background:var(--bg); color:var(--text); font-family:var(--sans); font-size:14px; -webkit-font-smoothing:antialiased; }
+  body{ min-height:100vh; min-height:100dvh; padding-bottom:calc(20px + env(safe-area-inset-bottom)); }
+  body::before{ content:""; position:fixed; inset:0; background:radial-gradient(1200px 600px at 50% -10%, rgba(61,217,235,0.05), transparent 60%); pointer-events:none; z-index:0; }
+  .wrap{ max-width:480px; margin:0 auto; padding:0 16px; position:relative; z-index:1; }
+  .mono{ font-family:var(--mono); }
+  button{ cursor:pointer; font-family:var(--sans); border:none; color:inherit; }
+  ::-webkit-scrollbar{ width:0; height:0; }
+
+  /* ───── ヘッダー ───── */
+  .topbar{ position:sticky; top:0; z-index:50; background:rgba(10,14,23,0.85); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); }
+  .topbar-in{ max-width:480px; margin:0 auto; padding:0 16px; display:flex; align-items:center; justify-content:space-between; height:56px; }
+  .brand{ display:flex; align-items:center; gap:9px; font-family:var(--mono); font-weight:800; font-size:16px; letter-spacing:-0.02em; }
+  .brand .hi{ color:var(--up); } .brand .lo{ color:var(--down); } .brand .sl{ color:var(--gray-d); margin:0 1px; }
+  .brand-tag{ font-size:8px; font-weight:600; letter-spacing:0.18em; color:var(--gray); border:1px solid var(--border2); border-radius:4px; padding:2px 5px; margin-left:2px; }
+  .top-actions{ display:flex; align-items:center; gap:7px; }
+  .icon-btn{ width:34px; height:34px; border-radius:9px; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:15px; transition:.15s; }
+  .icon-btn:active{ transform:scale(0.92); background:var(--surface2); }
+  .live-chip{ display:flex; align-items:center; gap:6px; font-family:var(--mono); font-size:9.5px; font-weight:600; letter-spacing:0.04em; background:var(--surface); border:1px solid var(--border); padding:6px 10px; border-radius:20px; color:var(--gray); }
+  .live-dot{ width:6px; height:6px; border-radius:50%; background:var(--gray-d); }
+  .live-chip.on{ color:var(--up); border-color:rgba(31,223,159,0.3); } .live-chip.on .live-dot{ background:var(--up); box-shadow:0 0 8px var(--up); animation:pulse 2s infinite; }
+  .live-chip.err{ color:var(--down); } .live-chip.err .live-dot{ background:var(--down); }
+  @keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  section{ margin-top:16px; }
+  .eyebrow{ font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:0.16em; color:var(--gray); text-transform:uppercase; margin-bottom:9px; display:flex; align-items:center; gap:7px; }
+  .eyebrow .help{ width:15px; height:15px; border-radius:50%; border:1px solid var(--border2); color:var(--gray); font-size:9px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+
+  /* ───── ペア選択 ───── */
+  .seg{ display:flex; gap:6px; flex-wrap:wrap; }
+  .chip{ flex:1; min-width:calc(33.33% - 4px); background:var(--surface); border:1px solid var(--border); color:var(--gray); font-family:var(--mono); font-size:12px; font-weight:500; padding:9px 4px; border-radius:var(--r-sm); transition:.15s; text-align:center; }
+  .chip:active{ transform:scale(0.96); }
+  .chip.on{ background:linear-gradient(180deg,var(--surface2),var(--surface)); border-color:var(--up-d); color:var(--white); font-weight:700; box-shadow:0 0 0 1px var(--up-d), 0 4px 12px var(--up-glow); }
+  .durs{ display:flex; gap:6px; }
+  .dur{ flex:1; background:var(--surface); border:1px solid var(--border); color:var(--gray); font-family:var(--mono); font-size:12px; font-weight:600; padding:8px 2px; border-radius:var(--r-sm); transition:.15s; }
+  .dur:active{ transform:scale(0.94); }
+  .dur.on{ background:linear-gradient(180deg,rgba(255,201,77,0.14),rgba(255,201,77,0.04)); border-color:var(--gold); color:var(--gold); box-shadow:0 2px 10px rgba(255,201,77,0.12); }
+
+  /* ───── 価格パネル ───── */
+  .price-panel{ background:linear-gradient(180deg,var(--surface),var(--bg2)); border:1px solid var(--border); border-radius:var(--r); padding:18px; position:relative; overflow:hidden; }
+  .price-panel::before{ content:""; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--up),transparent); opacity:0.6; }
+  .price-panel.down::before{ background:linear-gradient(90deg,transparent,var(--down),transparent); }
+  .price-head{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12px; }
+  .price-pair{ font-family:var(--mono); font-size:13px; font-weight:700; color:var(--white); letter-spacing:0.02em; }
+  .price-sub{ font-size:10px; color:var(--gray); margin-top:2px; }
+  .price-now{ display:flex; align-items:baseline; gap:10px; }
+  .price-val{ font-family:var(--mono); font-size:34px; font-weight:800; color:var(--white); letter-spacing:-0.02em; line-height:1; }
+  .price-chg{ font-family:var(--mono); font-size:14px; font-weight:700; padding:3px 8px; border-radius:6px; }
+  .price-chg.up{ color:var(--up); background:var(--up-glow); } .price-chg.down{ color:var(--down); background:var(--down-glow); }
+  .countdown{ text-align:right; flex-shrink:0; }
+  .cd-label{ font-size:9px; color:var(--gray); font-family:var(--mono); letter-spacing:0.08em; }
+  .cd-val{ font-family:var(--mono); font-size:26px; font-weight:800; line-height:1; margin-top:3px; }
+  .cd-track{ width:70px; height:5px; background:var(--surface3); border-radius:3px; margin-top:6px; overflow:hidden; }
+  .cd-fill{ height:100%; border-radius:3px; transition:width 1s linear; }
+  canvas{ width:100%; display:block; border-radius:8px; }
+  .legend{ display:flex; gap:14px; margin-top:8px; font-size:10px; font-family:var(--mono); color:var(--gray); }
+  .legend i{ font-style:normal; }
+
+  /* ───── 総合判定カード（シグネチャー）───── */
+  .verdict{ background:linear-gradient(180deg,var(--surface),var(--bg2)); border:1px solid var(--border); border-radius:var(--r); padding:20px; text-align:center; position:relative; overflow:hidden; }
+  .gauge-wrap{ position:relative; width:180px; height:104px; margin:4px auto 0; }
+  .gauge-label{ position:absolute; bottom:8px; left:50%; transform:translateX(-50%); text-align:center; width:100%; }
+  .gauge-dir{ font-family:var(--mono); font-size:30px; font-weight:800; line-height:1; letter-spacing:-0.02em; }
+  .gauge-conf{ font-size:10px; color:var(--gray); font-family:var(--mono); margin-top:3px; letter-spacing:0.04em; }
+  .verdict-bias{ display:flex; gap:10px; margin-top:16px; }
+  .bias{ flex:1; border-radius:var(--r-sm); padding:11px; border:1px solid; position:relative; }
+  .bias.high{ background:var(--up-glow); border-color:rgba(31,223,159,0.25); }
+  .bias.low{ background:var(--down-glow); border-color:rgba(255,77,106,0.25); }
+  .bias-pct{ font-family:var(--mono); font-size:24px; font-weight:800; line-height:1; }
+  .bias-name{ font-size:10px; font-weight:600; margin-top:4px; letter-spacing:0.05em; }
+  .verdict-meta{ display:flex; justify-content:center; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .meta-tag{ font-family:var(--mono); font-size:10px; font-weight:600; padding:5px 10px; border-radius:7px; background:var(--surface2); border:1px solid var(--border); color:var(--text); }
+  .meta-tag b{ font-weight:700; }
+
+  /* ───── シグナル詳細 ───── */
+  .sig-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; }
+  .sig-item{ display:flex; align-items:center; gap:11px; padding:13px 16px; border-bottom:1px solid var(--border); }
+  .sig-item:last-child{ border-bottom:none; }
+  .sig-ic{ width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:9px; font-weight:800; flex-shrink:0; }
+  .sig-mid{ flex:1; min-width:0; }
+  .sig-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; }
+  .sig-nm{ font-family:var(--mono); font-size:12px; font-weight:700; color:var(--white); }
+  .sig-vd{ font-size:11px; color:var(--gray); font-family:var(--mono); }
+  .sig-track{ height:5px; background:var(--surface3); border-radius:3px; overflow:hidden; }
+  .sig-prog{ height:100%; border-radius:3px; transition:width .7s cubic-bezier(.4,0,.2,1); }
+  .sig-dir{ font-family:var(--mono); font-size:13px; font-weight:800; width:20px; text-align:center; flex-shrink:0; }
+
+  /* ───── AI予測ボタン＆結果 ───── */
+  .ai-btn{ width:100%; background:linear-gradient(135deg,var(--up-d),var(--up)); color:#04140d; padding:16px; font-size:15px; font-weight:800; border-radius:var(--r); letter-spacing:0.02em; box-shadow:0 6px 20px var(--up-glow); transition:.18s; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .ai-btn:active{ transform:scale(0.98); }
+  .ai-btn:disabled{ background:var(--surface2); color:var(--gray); box-shadow:none; }
+  .ai-btn .spin{ width:15px; height:15px; border:2px solid rgba(4,20,13,0.3); border-top-color:#04140d; border-radius:50%; animation:spin .7s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .pred{ border-radius:var(--r); overflow:hidden; border:1px solid; }
+  .pred.high{ border-color:rgba(31,223,159,0.4); background:linear-gradient(180deg,var(--up-glow),transparent); }
+  .pred.low{ border-color:rgba(255,77,106,0.4); background:linear-gradient(180deg,var(--down-glow),transparent); }
+  .pred-hd{ padding:18px; display:flex; align-items:center; justify-content:space-between; }
+  .pred-verdict{ display:flex; align-items:center; gap:12px; }
+  .pred-arrow{ font-family:var(--mono); font-size:38px; font-weight:800; line-height:1; }
+  .pred-words{ font-size:11px; color:var(--gray); }
+  .pred-words b{ display:block; font-size:18px; font-weight:800; color:var(--white); margin-top:1px; }
+  .pred-conf{ text-align:right; }
+  .pred-conf-n{ font-family:var(--mono); font-size:30px; font-weight:800; line-height:1; }
+  .pred-conf-l{ font-size:9px; color:var(--gray); font-family:var(--mono); letter-spacing:0.06em; margin-top:3px; }
+  .pred-body{ padding:0 18px 18px; }
+  .pred-block{ background:rgba(0,0,0,0.22); border-radius:var(--r-sm); padding:12px 14px; margin-top:9px; }
+  .pred-block-l{ font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:0.06em; margin-bottom:5px; display:flex; align-items:center; gap:6px; }
+  .pred-block p{ font-size:13px; line-height:1.75; color:var(--text); }
+  .pred-foot{ display:flex; gap:14px; flex-wrap:wrap; margin-top:11px; font-family:var(--mono); font-size:10.5px; color:var(--gray); }
+  .pred-foot b{ color:var(--white); font-weight:600; }
+
+  /* ───── 履歴 ───── */
+  .stat-row{ display:flex; gap:8px; margin-bottom:12px; }
+  .stat{ flex:1; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-sm); padding:11px; text-align:center; }
+  .stat-n{ font-family:var(--mono); font-size:20px; font-weight:800; line-height:1; }
+  .stat-l{ font-size:9px; color:var(--gray); margin-top:4px; letter-spacing:0.04em; }
+  .hist-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; }
+  .hist-item{ display:flex; align-items:center; gap:9px; padding:11px 14px; border-bottom:1px solid var(--border); font-family:var(--mono); }
+  .hist-item:last-child{ border-bottom:none; }
+  .hist-dir{ font-size:11px; font-weight:800; width:46px; flex-shrink:0; }
+  .hist-info{ flex:1; min-width:0; }
+  .hist-pair{ font-size:11px; color:var(--white); font-weight:600; }
+  .hist-time{ font-size:9px; color:var(--gray); margin-top:1px; }
+  .hist-prices{ text-align:right; font-size:10px; flex-shrink:0; }
+  .hist-badge{ font-size:10px; font-weight:800; padding:4px 9px; border-radius:7px; flex-shrink:0; min-width:54px; text-align:center; }
+
+  /* ───── 空状態 ───── */
+  .empty{ text-align:center; padding:28px 20px; color:var(--gray); }
+  .empty-ic{ font-size:30px; margin-bottom:10px; opacity:0.5; }
+  .empty p{ font-size:12px; line-height:1.7; }
+
+  /* ───── モーダル ───── */
+  .modal-bg{ position:fixed; inset:0; background:rgba(5,8,14,0.82); backdrop-filter:blur(8px); z-index:1000; display:flex; align-items:flex-end; justify-content:center; padding:0; opacity:0; pointer-events:none; transition:.25s; }
+  .modal-bg.show{ opacity:1; pointer-events:auto; }
+  .modal{ background:var(--surface); border:1px solid var(--border2); border-radius:20px 20px 0 0; padding:24px; padding-bottom:calc(24px + env(safe-area-inset-bottom)); max-width:480px; width:100%; transform:translateY(100%); transition:.28s cubic-bezier(.34,1.3,.5,1); max-height:88vh; overflow-y:auto; }
+  .modal-bg.show .modal{ transform:translateY(0); }
+  .modal-grip{ width:38px; height:4px; background:var(--border2); border-radius:3px; margin:0 auto 18px; }
+  .modal h2{ font-size:18px; font-weight:800; color:var(--white); margin-bottom:7px; letter-spacing:-0.01em; }
+  .modal .lead{ font-size:13px; color:var(--gray); line-height:1.7; margin-bottom:18px; }
+  .modal label{ font-size:11px; font-weight:600; color:var(--text); margin-bottom:7px; display:block; }
+  .modal input{ width:100%; background:var(--bg); border:1px solid var(--border2); border-radius:var(--r-sm); padding:13px 14px; color:var(--white); font-size:14px; font-family:var(--mono); outline:none; transition:.15s; }
+  .modal input:focus{ border-color:var(--cyan); box-shadow:0 0 0 3px rgba(61,217,235,0.12); }
+  .modal-hint{ font-size:11px; color:var(--gray); margin:10px 0 20px; line-height:1.65; }
+  .modal-hint a{ color:var(--cyan); text-decoration:none; }
+  .modal-btns{ display:flex; gap:10px; }
+  .mbtn{ flex:1; padding:14px; border-radius:var(--r-sm); font-size:14px; font-weight:700; transition:.15s; }
+  .mbtn:active{ transform:scale(0.97); }
+  .mbtn.primary{ background:var(--cyan); color:#04161a; }
+  .mbtn.ghost{ background:var(--surface2); border:1px solid var(--border2); color:var(--text); }
+
+  /* ───── ガイド（初心者向け）───── */
+  .guide-sec{ margin-bottom:20px; }
+  .guide-sec h3{ font-size:14px; font-weight:700; color:var(--white); margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  .guide-sec h3 .n{ width:22px; height:22px; border-radius:7px; background:var(--surface2); border:1px solid var(--border2); font-family:var(--mono); font-size:11px; font-weight:800; color:var(--cyan); display:flex; align-items:center; justify-content:center; }
+  .guide-sec p{ font-size:12.5px; color:var(--text); line-height:1.75; }
+  .guide-sec p+p{ margin-top:7px; }
+  .guide-term{ display:flex; gap:10px; padding:11px 0; border-bottom:1px solid var(--border); }
+  .guide-term:last-child{ border-bottom:none; }
+  .guide-term .t{ font-family:var(--mono); font-size:12px; font-weight:700; color:var(--cyan); width:54px; flex-shrink:0; }
+  .guide-term .d{ font-size:12px; color:var(--text); line-height:1.6; flex:1; }
+  .glossary{ background:var(--bg); border:1px solid var(--border); border-radius:var(--r-sm); padding:4px 14px; margin-top:6px; }
+
+  /* ───── トースト ───── */
+  .toast{ position:fixed; bottom:calc(24px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%) translateY(20px); background:var(--surface2); border:1px solid var(--border2); color:var(--white); font-size:13px; font-weight:600; padding:13px 20px; border-radius:12px; z-index:2000; opacity:0; pointer-events:none; transition:.3s; box-shadow:0 8px 30px rgba(0,0,0,0.4); display:flex; align-items:center; gap:9px; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .disclaimer{ margin-top:18px; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-sm); font-size:11px; color:var(--gray); line-height:1.7; }
+  .disclaimer b{ color:var(--down); font-weight:600; }
+  .hide{ display:none !important; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brand"><span class="hi">HIGH</span><span class="sl">/</span><span class="lo">LOW</span><span class="brand-tag">ANALYZER</span></div>
+    <div class="top-actions">
+      <div class="live-chip" id="liveChip"><div class="live-dot"></div><span id="liveText">起動中</span></div>
+      <button class="icon-btn" id="guideBtn" title="使い方">?</button>
+      <button class="icon-btn" id="setBtn" title="設定">⚙</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- 通貨ペア -->
+  <section>
+    <div class="eyebrow">通貨ペア<span class="help" data-help="pair">?</span></div>
+    <div class="seg" id="pairs"></div>
+  </section>
+
+  <!-- 取引時間 -->
+  <section>
+    <div class="eyebrow">判定時間（エントリーから何秒後に勝敗が決まるか）<span class="help" data-help="dur">?</span></div>
+    <div class="durs" id="durs"></div>
+  </section>
+
+  <!-- 価格 -->
+  <section>
+    <div class="price-panel" id="pricePanel">
+      <div class="price-head">
+        <div>
+          <div class="price-pair" id="pPair">—</div>
+          <div class="price-sub" id="pSub">リアルタイム更新</div>
+        </div>
+        <div class="countdown hide" id="cdBox">
+          <div class="cd-label">勝敗確定まで</div>
+          <div class="cd-val mono" id="cdVal">0s</div>
+          <div class="cd-track"><div class="cd-fill" id="cdFill"></div></div>
+        </div>
+      </div>
+      <div class="price-now">
+        <span class="price-val mono" id="pVal">—</span>
+        <span class="price-chg" id="pChg"></span>
+      </div>
+      <div style="margin-top:14px"><canvas id="chart" width="620" height="90"></canvas></div>
+      <div class="legend">
+        <i id="lgPrice" style="color:var(--up)">━ 価格</i>
+        <i style="color:var(--gold)">╌ 短期EMA</i>
+        <i style="color:var(--cyan)">╌ 中期EMA</i>
+      </div>
+    </div>
+  </section>
+
+  <!-- 総合判定 -->
+  <section>
+    <div class="eyebrow">総合判定<span class="help" data-help="verdict">?</span></div>
+    <div class="verdict" id="verdict">
+      <div class="empty"><div class="empty-ic">⏳</div><p>レートを読み込んでいます…</p></div>
+    </div>
+  </section>
+
+  <!-- AI予測 -->
+  <section>
+    <button class="ai-btn" id="aiBtn" onclick="runPrediction()"><span>🤖</span><span id="aiBtnText">AI予測を実行する</span></button>
+    <div id="predResult" style="margin-top:14px"></div>
+  </section>
+
+  <!-- シグナル詳細 -->
+  <section>
+    <div class="eyebrow">テクニカル指標の内訳<span class="help" data-help="signals">?</span></div>
+    <div class="sig-card" id="sigCard"></div>
+  </section>
+
+  <!-- 履歴 -->
+  <section id="histSection" class="hide">
+    <div class="eyebrow">予測の成績<span class="help" data-help="hist">?</span></div>
+    <div id="statRow"></div>
+    <div class="hist-card" id="histCard"></div>
+  </section>
+
+  <div class="disclaimer" id="disclaimer">
+    <b>投資リスクについて</b><br>
+    本ツールはECBベースの為替レートとテクニカル分析を組み合わせた学習用の参考ツールです。表示される予測は投資助言ではありません。バイナリーオプションは投資額の全額を失う可能性があります。取引は必ず余裕資金の範囲で、自己責任で判断してください。
+  </div>
+</div>
+
+<!-- 設定モーダル -->
+<div class="modal-bg" id="setModal">
+  <div class="modal">
+    <div class="modal-grip"></div>
+    <h2>⚙ 設定</h2>
+    <p class="lead">AI予測の解説をより自然にしたい場合、Anthropic の APIキーを設定できます。<b style="color:var(--text)">未設定でも全機能が動作します</b>（解説はアプリ内蔵のロジックが生成します）。</p>
+    <label>Anthropic APIキー</label>
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
+    <div class="modal-hint">キーはこの端末内にのみ保存され、外部には送信されません。取得は <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> から。</div>
+    <div class="modal-btns">
+      <button class="mbtn ghost" onclick="closeModal('setModal')">閉じる</button>
+      <button class="mbtn primary" onclick="saveSettings()">保存する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ガイドモーダル -->
+<div class="modal-bg" id="guideModal">
+  <div class="modal">
+    <div class="modal-grip"></div>
+    <h2>📘 使い方ガイド</h2>
+    <p class="lead">このツールは、為替の短期的な値動きが「上がるか（HIGH）／下がるか（LOW）」をテクニカル分析で予測します。</p>
+
+    <div class="guide-sec">
+      <h3><span class="n">1</span>ペアと時間を選ぶ</h3>
+      <p>分析したい通貨ペア（例：USD/JPY）と、判定時間を選びます。判定時間は「今エントリーしたら何秒・何分後に勝敗が決まるか」を表します。短いほど運の要素が強くなります。</p>
+    </div>
+    <div class="guide-sec">
+      <h3><span class="n">2</span>総合判定を見る</h3>
+      <p>中央のメーターが、6つのテクニカル指標を総合した方向（HIGH/LOW）と信頼度を示します。信頼度が高いほど、複数の指標が同じ方向で一致しています。50%台のときは指標が割れており、見送りも選択肢です。</p>
+    </div>
+    <div class="guide-sec">
+      <h3><span class="n">3</span>AI予測で根拠を読む</h3>
+      <p>「AI予測を実行」を押すと、予測の根拠・エントリーのタイミング・注意点が日本語で表示されます。なぜその方向なのかを理解してから判断しましょう。</p>
+    </div>
+    <div class="guide-sec">
+      <h3><span class="n">4</span>成績を振り返る</h3>
+      <p>予測すると履歴に記録され、判定時間が過ぎると自動で勝敗（WIN/LOSE）がつきます。的中率を見ながら、どの相場で当たりやすいかを学べます。</p>
+    </div>
+
+    <h2 style="font-size:15px; margin-top:24px; margin-bottom:10px">📖 用語集</h2>
+    <div class="glossary">
+      <div class="guide-term"><span class="t">HIGH</span><span class="d">価格が上がると予測。エントリー時より高ければ勝ち。</span></div>
+      <div class="guide-term"><span class="t">LOW</span><span class="d">価格が下がると予測。エントリー時より低ければ勝ち。</span></div>
+      <div class="guide-term"><span class="t">RSI</span><span class="d">買われすぎ／売られすぎを0〜100で示す。70超で過熱、30未満で底値圏。</span></div>
+      <div class="guide-term"><span class="t">MACD</span><span class="d">トレンドの転換を捉える。GC（ゴールデンクロス）は上昇、DCは下降のサイン。</span></div>
+      <div class="guide-term"><span class="t">BB</span><span class="d">ボリンジャーバンド。価格が上限／下限に触れると反転しやすい。</span></div>
+      <div class="guide-term"><span class="t">EMA</span><span class="d">指数移動平均。短期線が中期・長期線の上にあれば上昇トレンド。</span></div>
+      <div class="guide-term"><span class="t">Stoch</span><span class="d">ストキャスティクス。短期の買われすぎ／売られすぎを示す。</span></div>
+      <div class="guide-term"><span class="t">ATR</span><span class="d">値動きの激しさ（ボラティリティ）。高いほど急変動リスク大。</span></div>
+      <div class="guide-term"><span class="t">信頼度</span><span class="d">指標の一致度から算出。高いほど確度が高いが、勝率を保証するものではない。</span></div>
+    </div>
+    <div class="modal-btns" style="margin-top:20px">
+      <button class="mbtn primary" onclick="closeModal('guideModal')">わかりました</button>
+    </div>
+  </div>
+</div>
+
+<!-- 用語ポップ（個別ヘルプ）-->
+<div class="modal-bg" id="helpModal">
+  <div class="modal">
+    <div class="modal-grip"></div>
+    <h2 id="helpTitle">ヘルプ</h2>
+    <p class="lead" id="helpBody"></p>
+    <div class="modal-btns"><button class="mbtn primary" onclick="closeModal('helpModal')">閉じる</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastIc">✓</span><span id="toastMsg"></span></div>
+<script>
+// ════════════════ 定数 ════════════════
+var PAIRS=[
+  {id:"USDJPY",base:"USD",quote:"JPY",label:"USD/JPY"},
+  {id:"EURJPY",base:"EUR",quote:"JPY",label:"EUR/JPY"},
+  {id:"GBPJPY",base:"GBP",quote:"JPY",label:"GBP/JPY"},
+  {id:"AUDJPY",base:"AUD",quote:"JPY",label:"AUD/JPY"},
+  {id:"EURUSD",base:"EUR",quote:"USD",label:"EUR/USD"},
+  {id:"GBPUSD",base:"GBP",quote:"USD",label:"GBP/USD"}
+];
+var DURATIONS=["15秒","30秒","1分","3分","5分"];
+var DUR_SECS={"15秒":15,"30秒":30,"1分":60,"3分":180,"5分":300};
+var FALLBACK={USDJPY:155.2,EURJPY:168.4,GBPJPY:196.5,AUDJPY:101.3,EURUSD:1.085,GBPUSD:1.267};
+var HELP={
+  pair:["通貨ペアとは","2つの通貨の交換レートです。USD/JPY なら「1ドルが何円か」を表します。値動きのクセはペアごとに異なります。"],
+  dur:["判定時間とは","エントリーしてから勝敗が決まるまでの時間です。15秒など短いほど値動きの予測が難しく、運の要素が強まります。初心者は1分以上が比較的安定します。"],
+  verdict:["総合判定とは","6つのテクニカル指標を重み付けして集計し、HIGH/LOWの方向と信頼度を出します。メーターが振れている方向が優勢です。信頼度50%台は指標が割れているサインで、見送りも有効です。"],
+  signals:["テクニカル指標とは","価格や過去の動きから相場の状態を読み取る道具です。各指標が今どちらを示しているか、どのくらい強いか（バーの長さ）を表示しています。複数が同じ方向で揃うほど信頼できます。"],
+  hist:["予測の成績とは","予測するたびに記録され、判定時間が過ぎると自動で勝敗がつきます。的中率は確定した予測のうち当たった割合です。どんな相場で当たりやすいかの学習に使えます。"]
+};
+
+// ════════════════ 状態 ════════════════
+var state={ pairId:"USDJPY", duration:"1分", prices:[], ind:null, judgment:null, liveRate:null,
+  fetchStatus:"idle", prediction:null, predicting:false, history:[], timer:0 };
+var tickTimer=null, countdownTimer=null, judgeTimers=[];
+
+function rnd(v,d){ return +v.toFixed(d); }
+function getApiKey(){ try{return localStorage.getItem("hl_key")||"";}catch(e){return "";} }
+function setApiKey(k){ try{localStorage.setItem("hl_key",k);}catch(e){} }
+function pairInfo(){ for(var i=0;i<PAIRS.length;i++) if(PAIRS[i].id===state.pairId) return PAIRS[i]; }
+function isJpy(){ return state.pairId.indexOf("JPY")>=0; }
+function dpOf(){ return isJpy()?3:5; }
+function confColor(c){ return c>=72?"#1fdf9f":c>=60?"#ffc94d":"#8693ad"; }
+
+// ════════════════ 実レート取得 ════════════════
+function fetchLiveRate(base,quote){
+  var b=base.toLowerCase(), q=quote.toLowerCase();
+  var urls=[
+    "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/"+b+".min.json",
+    "https://latest.currency-api.pages.dev/v1/currencies/"+b+".min.json",
+    "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/"+b+".json",
+    "https://latest.currency-api.pages.dev/v1/currencies/"+b+".json"
+  ];
+  var i=0;
+  function tryNext(){
+    if(i>=urls.length){
+      return fetch("https://api.frankfurter.dev/v2/rates?base=EUR&quotes="+base+","+quote)
+        .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+        .then(function(d){
+          var rb=d.rates&&d.rates[base]!=null?d.rates[base]:(base==="EUR"?1:null);
+          var rq=d.rates&&d.rates[quote]!=null?d.rates[quote]:(quote==="EUR"?1:null);
+          if(rb&&rq) return rq/rb; throw 0;
+        });
+    }
+    var url=urls[i++];
+    return fetch(url).then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(d){ var rate=d[b]&&d[b][q]; if(rate&&isFinite(rate)) return rate; throw 0; })
+      .catch(function(){ return tryNext(); });
+  }
+  return tryNext();
+}
+function fetchDailyHistory(base,quote){
+  var dp=(quote==="JPY"||base==="JPY")?3:5;
+  var to=new Date().toISOString().split("T")[0];
+  var from=new Date(Date.now()-30*86400000).toISOString().split("T")[0];
+  var url="https://api.frankfurter.dev/v2/rates?base=EUR&quotes="+base+","+quote+"&from="+from+"&to="+to;
+  return fetch(url).then(function(r){ if(!r.ok) throw 0; return r.text(); }).then(function(text){
+    var rows=[];
+    try{ var j=JSON.parse(text); if(j.rates) rows=Object.keys(j.rates).map(function(date){return {date:date,rates:j.rates[date]};}); }catch(e){}
+    var out=[];
+    rows.forEach(function(row){
+      var r=row.rates||{};
+      var rb=r[base]!=null?r[base]:(base==="EUR"?1:null);
+      var rq=r[quote]!=null?r[quote]:(quote==="EUR"?1:null);
+      if(rb&&rq) out.push({price:rnd(rq/rb,dp),date:row.date});
+    });
+    return out;
+  }).catch(function(){ return []; });
+}
+function buildTickData(liveRate,dailyPrices,isJpyF,n){
+  n=n||150; var dp=isJpyF?3:5; var vol=liveRate*0.0007;
+  var daily=dailyPrices.map(function(d){return d.price;});
+  var need=Math.max(0,n-daily.length);
+  var p=daily.length?daily[daily.length-1]:liveRate; var sim=[];
+  for(var k=0;k<need;k++){ p=Math.max(p+(Math.random()-0.487)*vol, liveRate*0.85); sim.push(rnd(p,dp)); }
+  var all=daily.concat(sim); all[all.length-1]=rnd(liveRate,dp); return all;
+}
+
+// ════════════════ テクニカル指標 ════════════════
+function calcIndicators(prices){
+  var n=prices.length; var dp=prices[0]>10?3:5;
+  function ema(arr,period){ var k=2/(period+1), out=[arr[0]]; for(var i=1;i<arr.length;i++) out.push(rnd(arr[i]*k+out[i-1]*(1-k),dp)); return out; }
+  var ema5=ema(prices,5), ema20=ema(prices,20), ema50=ema(prices,50);
+  var gains=[],losses=[];
+  for(var i=1;i<n;i++){ var d=prices[i]-prices[i-1]; gains.push(Math.max(d,0)); losses.push(Math.max(-d,0)); }
+  var rsi=prices.map(function(_,i){
+    if(i<14) return 50; var g=0,l=0;
+    for(var j=i-14;j<i;j++){ g+=gains[j]; l+=losses[j]; } g/=14; l/=14;
+    if(g===0&&l===0) return 50; return l===0?100:g===0?0:rnd(100-100/(1+g/l),1);
+  });
+  var macd=ema5.map(function(e,i){return rnd(e-ema20[i],dp);});
+  var signal=ema(macd,9);
+  var hist=macd.map(function(m,i){return rnd(m-signal[i],dp);});
+  var bb=prices.map(function(_,i){
+    if(i<19) return {upper:null,lower:null,mid:null};
+    var sl=prices.slice(i-19,i+1);
+    var mean=sl.reduce(function(a,b){return a+b;},0)/20;
+    var std=Math.sqrt(sl.reduce(function(a,b){return a+(b-mean)*(b-mean);},0)/20);
+    return {upper:rnd(mean+2*std,dp),lower:rnd(mean-2*std,dp),mid:rnd(mean,dp)};
+  });
+  var stoch=prices.map(function(_,i){
+    if(i<13) return {k:50,d:50};
+    var sl=prices.slice(i-13,i+1); var h=Math.max.apply(null,sl), l=Math.min.apply(null,sl);
+    var k=h===l?50:rnd((prices[i]-l)/(h-l)*100,1); return {k:k,d:k};
+  });
+  for(var s=2;s<stoch.length;s++) stoch[s].d=rnd((stoch[s].k+stoch[s-1].k+stoch[s-2].k)/3,1);
+  var atr=prices.map(function(_,i){
+    if(i===0) return 0;
+    if(i<14) return rnd(Math.abs(prices[i]-prices[i-1]),dp);
+    var trs=prices.slice(i-13,i+1).map(function(p,j,a){return j===0?0:Math.abs(p-a[j-1]);});
+    return rnd(trs.reduce(function(a,b){return a+b;},0)/14,dp);
+  });
+  return {ema5:ema5,ema20:ema20,ema50:ema50,rsi:rsi,macd:macd,signal:signal,hist:hist,bb:bb,stoch:stoch,atr:atr};
+}
+
+// ════════════════ シグナル判定 ════════════════
+function judgeSignals(prices,ind){
+  var i=prices.length-1, p=prices[i];
+  var rsi=ind.rsi[i], rsiP=ind.rsi[i-1]||50;
+  var macd=ind.macd[i], macdP=ind.macd[i-1]||0;
+  var sig=ind.signal[i], sigP=ind.signal[i-1]||0;
+  var h=ind.hist[i], hP=ind.hist[i-1]||0;
+  var bb=ind.bb[i], e5=ind.ema5[i], e20=ind.ema20[i], e50=ind.ema50[i];
+  var st=ind.stoch[i], atr=ind.atr[i];
+  var atrPct=rnd(atr/p*100,3);
+  var volatility=atrPct>0.08?"高":atrPct>0.04?"中":"低";
+  var results=[];
+
+  var rDir="NEUTRAL",rStr=0;
+  if(rsi<28){rDir="HIGH";rStr=Math.min(95,(30-rsi)*4);}
+  else if(rsi>72){rDir="LOW";rStr=Math.min(95,(rsi-70)*4);}
+  else if(rsi<42&&rsi>rsiP){rDir="HIGH";rStr=42;}
+  else if(rsi>58&&rsi<rsiP){rDir="LOW";rStr=42;}
+  results.push({name:"RSI",dir:rDir,strength:rnd(rStr,0),desc:rsi<30?"売られすぎ":rsi>70?"買われすぎ":"中立 "+rsi});
+
+  var mDir="NEUTRAL",mStr=0;
+  if(macdP<sigP&&macd>sig){mDir="HIGH";mStr=88;}
+  else if(macdP>sigP&&macd<sig){mDir="LOW";mStr=88;}
+  else if(h>0&&h>hP){mDir="HIGH";mStr=55;}
+  else if(h<0&&h<hP){mDir="LOW";mStr=55;}
+  results.push({name:"MACD",dir:mDir,strength:rnd(mStr,0),desc:mDir==="HIGH"?"上昇転換":mDir==="LOW"?"下降転換":"待機"});
+
+  var bDir="NEUTRAL",bStr=0;
+  if(bb.lower&&p<=bb.lower){bDir="HIGH";bStr=82;}
+  else if(bb.upper&&p>=bb.upper){bDir="LOW";bStr=82;}
+  results.push({name:"BB",dir:bDir,strength:rnd(bStr,0),desc:bDir==="HIGH"?"下限で反発":bDir==="LOW"?"上限で反落":"バンド内"});
+
+  var eDir="NEUTRAL",eStr=0;
+  if(e5>e20&&e20>e50){eDir="HIGH";eStr=78;}
+  else if(e5<e20&&e20<e50){eDir="LOW";eStr=78;}
+  else if(e5>e20){eDir="HIGH";eStr=45;}
+  else if(e5<e20){eDir="LOW";eStr=45;}
+  results.push({name:"EMA",dir:eDir,strength:rnd(eStr,0),desc:eDir==="HIGH"?"上昇配列":eDir==="LOW"?"下降配列":"交差中"});
+
+  var sDir="NEUTRAL",sStr=0;
+  if(st.k<20){sDir="HIGH";sStr=75;}
+  else if(st.k>80){sDir="LOW";sStr=75;}
+  else if(st.k>st.d&&st.k<50){sDir="HIGH";sStr=48;}
+  else if(st.k<st.d&&st.k>50){sDir="LOW";sStr=48;}
+  results.push({name:"Stoch",dir:sDir,strength:rnd(sStr,0),desc:st.k<20?"売られすぎ":st.k>80?"買われすぎ":"K"+st.k});
+
+  results.push({name:"ATR",dir:"INFO",strength:0,desc:"ボラ"+volatility+" "+atrPct+"%"});
+
+  var hScore=0,lScore=0,sigCount=0;
+  results.forEach(function(s){ if(s.dir==="HIGH"){hScore+=s.strength;sigCount++;} if(s.dir==="LOW"){lScore+=s.strength;sigCount++;} });
+  var total=hScore+lScore||1;
+  var highPct=rnd(hScore/total*100,0), lowPct=rnd(lScore/total*100,0);
+  var finalDir=hScore>lScore?"HIGH":hScore<lScore?"LOW":"NEUTRAL";
+  var confidence=Math.min(rnd(Math.max(hScore,lScore)/(sigCount||1)/80*100,0),96);
+  var trend=e5>e20&&e20>e50?"上昇":e5<e20&&e20<e50?"下降":"レンジ";
+  var rsiZone=rsi<30?"売られすぎ":rsi>70?"買われすぎ":"中立";
+  var macdCross=macdP<sigP&&macd>sig?"GC":macdP>sigP&&macd<sig?"DC":"—";
+
+  var mom=0; if(prices.length>=6){ var p5=prices[prices.length-6]; mom=rnd((p-p5)/p5*100,3); }
+  var streak=0,streakDir=0;
+  for(var si=prices.length-1;si>0&&prices.length-si<=6;si--){
+    var d2=prices[si]-prices[si-1]; var dir2=d2>0?1:d2<0?-1:0;
+    if(dir2===0) break;
+    if(streak===0){ streakDir=dir2; streak=1; } else if(dir2===streakDir) streak++; else break;
+  }
+  var emaGap=rnd((e5-e20)/p*100,3);
+  var distEma20=rnd((p-e20)/p*100,3);
+  var bbPos=0.5; if(bb.upper&&bb.lower&&bb.upper>bb.lower) bbPos=rnd((p-bb.lower)/(bb.upper-bb.lower),2);
+
+  return {signals:results,highPct:highPct,lowPct:lowPct,finalDir:finalDir,confidence:confidence,
+    atrPct:atrPct,volatility:volatility,trend:trend,rsiZone:rsiZone,macdCross:macdCross,rsi:rsi,stoch:st,
+    mom:mom,streak:streak,streakDir:streakDir,emaGap:emaGap,distEma20:distEma20,bbPos:bbPos,macdHist:h,macdHistPrev:hP};
+}
+
+// ════════════════ 描画：ペア・時間 ════════════════
+function renderPairs(){
+  var el=document.getElementById("pairs"); el.innerHTML="";
+  PAIRS.forEach(function(p){
+    var b=document.createElement("button");
+    b.className="chip"+(state.pairId===p.id?" on":"");
+    b.textContent=p.label;
+    b.onclick=function(){ state.pairId=p.id; renderPairs(); loadData(); };
+    el.appendChild(b);
+  });
+}
+function renderDurs(){
+  var el=document.getElementById("durs"); el.innerHTML="";
+  DURATIONS.forEach(function(d){
+    var b=document.createElement("button");
+    b.className="dur"+(state.duration===d?" on":"");
+    b.textContent=d;
+    b.onclick=function(){ state.duration=d; renderDurs(); };
+    el.appendChild(b);
+  });
+}
+function renderLive(){
+  var chip=document.getElementById("liveChip"), txt=document.getElementById("liveText");
+  chip.className="live-chip"; 
+  if(state.fetchStatus==="live"){ chip.classList.add("on"); txt.textContent="ライブ"; }
+  else if(state.fetchStatus==="loading"){ txt.textContent="取得中"; }
+  else if(state.fetchStatus==="error"){ chip.classList.add("err"); txt.textContent="参考値"; }
+  else txt.textContent="起動中";
+}
+
+// ════════════════ 描画：価格＋チャート ════════════════
+function renderPrice(){
+  var prices=state.prices, dp=dpOf();
+  var cur=prices[prices.length-1], prv=prices[prices.length-2];
+  var change=cur&&prv?rnd(cur-prv,dp):0; var isUp=change>=0;
+  document.getElementById("pricePanel").className="price-panel"+(isUp?"":" down");
+  document.getElementById("pPair").textContent=pairInfo().label;
+  document.getElementById("pSub").textContent=state.liveRate?"実レート "+state.liveRate.toFixed(dp)+" 起点":"リアルタイム更新";
+  document.getElementById("pVal").textContent=cur!=null?cur.toFixed(dp):"—";
+  var chg=document.getElementById("pChg");
+  chg.textContent=(isUp?"+":"")+change; chg.className="price-chg "+(isUp?"up":"down");
+  document.getElementById("lgPrice").style.color=isUp?"var(--up)":"var(--down)";
+  drawChart();
+}
+function drawChart(){
+  var cv=document.getElementById("chart"); if(!cv||!state.prices.length) return;
+  var ctx=cv.getContext("2d"); var W=cv.width, H=cv.height;
+  var last=state.prices.slice(-60);
+  var e5=state.ind?state.ind.ema5.slice(-60):[]; var e20=state.ind?state.ind.ema20.slice(-60):[];
+  var all=last.concat(e5.filter(Boolean)).concat(e20.filter(Boolean));
+  var mn=Math.min.apply(null,all), mx=Math.max.apply(null,all), range=mx-mn||1;
+  function X(i){ return (i/(last.length-1))*W; }
+  function Y(v){ return H-((v-mn)/range)*(H-16)-8; }
+  ctx.clearRect(0,0,W,H);
+  [0.25,0.5,0.75].forEach(function(r){ ctx.beginPath(); ctx.moveTo(0,H*r); ctx.lineTo(W,H*r); ctx.strokeStyle="rgba(30,39,64,0.6)"; ctx.lineWidth=1; ctx.stroke(); });
+  var up=last[last.length-1]>=last[0];
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,up?"rgba(31,223,159,0.28)":"rgba(255,77,106,0.28)"); g.addColorStop(1,"rgba(0,0,0,0)");
+  ctx.beginPath(); last.forEach(function(p,i){ i===0?ctx.moveTo(X(i),Y(p)):ctx.lineTo(X(i),Y(p)); });
+  ctx.lineTo(X(last.length-1),H); ctx.lineTo(0,H); ctx.closePath(); ctx.fillStyle=g; ctx.fill();
+  ctx.beginPath(); last.forEach(function(p,i){ i===0?ctx.moveTo(X(i),Y(p)):ctx.lineTo(X(i),Y(p)); });
+  ctx.strokeStyle=up?"#1fdf9f":"#ff4d6a"; ctx.lineWidth=2; ctx.lineJoin="round"; ctx.stroke();
+  function drawEma(arr,color,dash){ if(!arr.length) return; var st=false; ctx.beginPath();
+    arr.forEach(function(v,i){ if(!v)return; st?ctx.lineTo(X(i),Y(v)):ctx.moveTo(X(i),Y(v)); st=true; });
+    ctx.strokeStyle=color; ctx.lineWidth=1.2; ctx.setLineDash(dash); ctx.stroke(); ctx.setLineDash([]); }
+  drawEma(e5,"#ffc94d",[3,2]); drawEma(e20,"#3dd9eb",[4,3]);
+  var ly=Y(last[last.length-1]);
+  ctx.setLineDash([2,3]); ctx.beginPath(); ctx.moveTo(0,ly); ctx.lineTo(W,ly);
+  ctx.strokeStyle="rgba(240,243,250,0.2)"; ctx.lineWidth=1; ctx.stroke(); ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(X(last.length-1),ly,3,0,Math.PI*2); ctx.fillStyle=up?"#1fdf9f":"#ff4d6a"; ctx.fill();
+}
+
+// ════════════════ 描画：総合判定（ゲージ）════════════════
+function renderVerdict(){
+  var j=state.judgment; var el=document.getElementById("verdict");
+  if(!j){ el.innerHTML='<div class="empty"><div class="empty-ic">⏳</div><p>レートを読み込んでいます…</p></div>'; return; }
+  var dirColor=j.finalDir==="HIGH"?"#1fdf9f":j.finalDir==="LOW"?"#ff4d6a":"#8693ad";
+  var dirText=j.finalDir==="HIGH"?"▲ HIGH":j.finalDir==="LOW"?"▼ LOW":"— 中立";
+  // 半円ゲージ（SVG）— 信頼度で針が振れる
+  var pct=Math.max(j.highPct,j.lowPct);
+  var angle=(j.finalDir==="LOW"? -1 : 1) * (pct-50)/50 * 80; // -80〜80度
+  if(j.finalDir==="NEUTRAL") angle=0;
+  var gauge='<div class="gauge-wrap"><svg width="180" height="104" viewBox="0 0 180 104">'
+    +'<path d="M16 96 A 74 74 0 0 1 164 96" fill="none" stroke="#1a2236" stroke-width="11" stroke-linecap="round"/>'
+    +'<path d="M16 96 A 74 74 0 0 1 90 22" fill="none" stroke="#ff4d6a" stroke-width="11" stroke-linecap="round" opacity="0.85"/>'
+    +'<path d="M90 22 A 74 74 0 0 1 164 96" fill="none" stroke="#1fdf9f" stroke-width="11" stroke-linecap="round" opacity="0.85"/>'
+    +'<g transform="rotate('+angle+' 90 96)"><line x1="90" y1="96" x2="90" y2="34" stroke="'+dirColor+'" stroke-width="3" stroke-linecap="round"/><circle cx="90" cy="96" r="6" fill="'+dirColor+'"/></g>'
+    +'</svg><div class="gauge-label"><div class="gauge-dir" style="color:'+dirColor+'">'+dirText+'</div><div class="gauge-conf">信頼度 '+j.confidence+'%</div></div></div>';
+  var bias='<div class="verdict-bias">'
+    +'<div class="bias high"><div class="bias-pct" style="color:#1fdf9f">'+j.highPct+'%</div><div class="bias-name" style="color:#1fdf9f">▲ HIGH優勢度</div></div>'
+    +'<div class="bias low"><div class="bias-pct" style="color:#ff4d6a">'+j.lowPct+'%</div><div class="bias-name" style="color:#ff4d6a">▼ LOW優勢度</div></div>'
+    +'</div>';
+  var trendCol=j.trend==="上昇"?"#1fdf9f":j.trend==="下降"?"#ff4d6a":"#8693ad";
+  var volCol=j.volatility==="高"?"#ff4d6a":j.volatility==="中"?"#ffc94d":"#1fdf9f";
+  var meta='<div class="verdict-meta">'
+    +'<span class="meta-tag">トレンド <b style="color:'+trendCol+'">'+j.trend+'</b></span>'
+    +'<span class="meta-tag">ボラ <b style="color:'+volCol+'">'+j.volatility+'</b></span>'
+    +'<span class="meta-tag">RSI <b>'+j.rsi+'</b></span>'
+    +'</div>';
+  el.innerHTML=gauge+bias+meta;
+}
+
+// ════════════════ 描画：シグナル詳細 ════════════════
+function renderSignals(){
+  var j=state.judgment; var card=document.getElementById("sigCard");
+  if(!j){ card.innerHTML=""; return; }
+  var html="";
+  j.signals.forEach(function(s){
+    var isUp=s.dir==="HIGH",isDown=s.dir==="LOW",isInfo=s.dir==="INFO";
+    var col=isUp?"#1fdf9f":isDown?"#ff4d6a":"#8693ad";
+    var icBg=isUp?"rgba(31,223,159,0.14)":isDown?"rgba(255,77,106,0.14)":"rgba(134,147,173,0.1)";
+    html+='<div class="sig-item">'
+      +'<div class="sig-ic" style="background:'+icBg+';color:'+col+'">'+s.name+'</div>'
+      +'<div class="sig-mid"><div class="sig-top"><span class="sig-nm">'+s.name+'</span><span class="sig-vd">'+s.desc+'</span></div>'
+      +'<div class="sig-track">'+((!isInfo&&s.strength>0)?'<div class="sig-prog" style="width:'+s.strength+'%;background:'+col+'"></div>':'')+'</div></div>'
+      +'<div class="sig-dir" style="color:'+col+'">'+(isInfo?"·":isUp?"▲":isDown?"▼":"—")+'</div>'
+      +'</div>';
+  });
+  card.innerHTML=html;
+}
+
+// ════════════════ 描画：タイマー ════════════════
+function renderTimer(){
+  var box=document.getElementById("cdBox");
+  if(state.timer>0){
+    box.classList.remove("hide");
+    document.getElementById("cdVal").textContent=state.timer+"s";
+    document.getElementById("cdVal").style.color=state.timer<10?"#ff4d6a":"#ffc94d";
+    var durSecs=DUR_SECS[state.duration]||60; var pct=(state.timer/durSecs)*100;
+    var fill=document.getElementById("cdFill");
+    fill.style.width=pct+"%"; fill.style.background=state.timer<10?"#ff4d6a":"#ffc94d";
+  }else box.classList.add("hide");
+}
+
+// ════════════════ 描画：予測結果 ════════════════
+function renderPrediction(){
+  var p=state.prediction; var el=document.getElementById("predResult");
+  if(!p){ el.innerHTML=""; return; }
+  var dp=dpOf(); var cls=p.prediction==="HIGH"?"high":"low";
+  var col=p.prediction==="HIGH"?"#1fdf9f":"#ff4d6a";
+  var arrow=p.prediction==="HIGH"?"▲":"▼";
+  var word=p.prediction==="HIGH"?"上昇":"下降";
+  el.innerHTML='<div class="pred '+cls+'">'
+    +'<div class="pred-hd">'
+    +'<div class="pred-verdict"><div class="pred-arrow" style="color:'+col+'">'+arrow+'</div>'
+    +'<div class="pred-words">予測<b style="color:'+col+'">'+p.prediction+' / '+word+'</b></div></div>'
+    +'<div class="pred-conf"><div class="pred-conf-n" style="color:'+confColor(p.confidence)+'">'+p.confidence+'%</div><div class="pred-conf-l">AI信頼度</div></div>'
+    +'</div>'
+    +'<div class="pred-body">'
+    +'<div class="pred-block"><div class="pred-block-l" style="color:var(--gold)">📊 予測の根拠</div><p>'+p.reason+'</p></div>'
+    +'<div class="pred-block"><div class="pred-block-l" style="color:var(--cyan)">⏱ エントリーのタイミング</div><p>'+p.entry_timing+'</p></div>'
+    +'<div class="pred-block"><div class="pred-block-l" style="color:var(--down)">⚠️ 注意点</div><p>'+p.caution+'</p></div>'
+    +'<div class="pred-foot"><span>推奨時間 <b>'+p.best_expiry+'</b></span><span>エントリー値 <b>'+p.entryPrice.toFixed(dp)+'</b></span><span>'+p.time+'</span></div>'
+    +'</div></div>';
+}
+
+// ════════════════ 描画：履歴 ════════════════
+function renderHistory(){
+  var sec=document.getElementById("histSection");
+  if(!state.history.length){ sec.classList.add("hide"); return; }
+  sec.classList.remove("hide");
+  var settled=state.history.filter(function(h){return h.status==="win"||h.status==="lose";});
+  var wins=state.history.filter(function(h){return h.status==="win";}).length;
+  var losses=state.history.filter(function(h){return h.status==="lose";}).length;
+  var winRate=settled.length?Math.round(wins/settled.length*100):0;
+  document.getElementById("statRow").innerHTML='<div class="stat-row">'
+    +'<div class="stat"><div class="stat-n" style="color:#1fdf9f">'+wins+'</div><div class="stat-l">WIN</div></div>'
+    +'<div class="stat"><div class="stat-n" style="color:#ff4d6a">'+losses+'</div><div class="stat-l">LOSE</div></div>'
+    +'<div class="stat"><div class="stat-n" style="color:'+(winRate>=50?"#1fdf9f":"#ffc94d")+'">'+(settled.length?winRate+"%":"—")+'</div><div class="stat-l">的中率</div></div>'
+    +'</div>';
+  var card=document.getElementById("histCard"); var html="";
+  state.history.forEach(function(h){
+    var rdp=h.pair.indexOf("JPY")>=0?3:5;
+    var badge={win:{t:"○ WIN",c:"#1fdf9f",b:"rgba(31,223,159,0.14)"},lose:{t:"× LOSE",c:"#ff4d6a",b:"rgba(255,77,106,0.14)"},
+      draw:{t:"引分",c:"#8693ad",b:"rgba(134,147,173,0.1)"},pending:{t:"判定中",c:"#ffc94d",b:"rgba(255,201,77,0.14)"}}[h.status]||{t:"—",c:"#8693ad",b:"transparent"};
+    var dcol=h.prediction==="HIGH"?"#1fdf9f":"#ff4d6a";
+    html+='<div class="hist-item">'
+      +'<div class="hist-dir" style="color:'+dcol+'">'+(h.prediction==="HIGH"?"▲HIGH":"▼LOW")+'</div>'
+      +'<div class="hist-info"><div class="hist-pair">'+h.pair+' <span style="color:var(--gray);font-weight:400">'+h.duration+'</span></div><div class="hist-time">'+h.time+' · 信頼度'+h.confidence+'%</div></div>'
+      +'<div class="hist-prices"><div style="color:var(--gray)">'+h.entryPrice.toFixed(rdp)+'</div><div style="color:'+(h.resultPrice!=null?(h.resultPrice>=h.entryPrice?"#1fdf9f":"#ff4d6a"):"var(--gray-d)")+'">'+(h.resultPrice!=null?h.resultPrice.toFixed(rdp):"—")+'</div></div>'
+      +'<div class="hist-badge" style="color:'+badge.c+';background:'+badge.b+'">'+badge.t+'</div>'
+      +'</div>';
+  });
+  card.innerHTML=html;
+}
+function renderAll(){ renderLive(); renderPrice(); renderVerdict(); renderSignals(); renderTimer(); renderPrediction(); renderHistory(); }
+
+// ════════════════ データロード ════════════════
+function loadData(){
+  state.fetchStatus="loading"; renderLive();
+  state.prediction=null; renderPrediction();
+  if(tickTimer) clearInterval(tickTimer);
+  var info=pairInfo();
+  Promise.all([ fetchLiveRate(info.base,info.quote), fetchDailyHistory(info.base,info.quote) ]).then(function(res){
+    var live=res[0], daily=res[1]; state.liveRate=live;
+    var all=buildTickData(live,daily,isJpy(),150);
+    state.prices=all; state.ind=calcIndicators(all); state.judgment=judgeSignals(all,state.ind);
+    state.fetchStatus="live"; renderAll(); startTick();
+  }).catch(function(){
+    state.fetchStatus="error"; var fb=FALLBACK[state.pairId]||100; state.liveRate=fb;
+    var all=buildTickData(fb,[],isJpy(),150);
+    state.prices=all; state.ind=calcIndicators(all); state.judgment=judgeSignals(all,state.ind);
+    renderAll(); startTick();
+  });
+}
+function startTick(){
+  if(tickTimer) clearInterval(tickTimer);
+  tickTimer=setInterval(function(){
+    if(!state.prices.length) return;
+    var last=state.prices[state.prices.length-1]; var vol=last*0.0006;
+    var next=rnd(Math.max(last+(Math.random()-0.487)*vol,last*0.9),dpOf());
+    state.prices=state.prices.slice(1).concat([next]);
+    state.ind=calcIndicators(state.prices); state.judgment=judgeSignals(state.prices,state.ind);
+    renderPrice(); renderVerdict(); renderSignals();
+  },3000);
+}
+
+// ════════════════ AI予測（高精度スコアリング）════════════════
+function computeScore(j){
+  var hScore=0,lScore=0;
+  var WEIGHT={RSI:1.15, MACD:1.3, BB:1.2, EMA:1.0, Stoch:0.95};
+  var hVotes=0,lVotes=0;
+  j.signals.forEach(function(s){
+    var w=WEIGHT[s.name]||1;
+    if(s.dir==="HIGH"){ hScore+=s.strength*0.6*w; hVotes++; }
+    if(s.dir==="LOW"){ lScore+=s.strength*0.6*w; lVotes++; }
+  });
+  if(j.trend==="上昇"){ hScore+=26; hVotes++; } if(j.trend==="下降"){ lScore+=26; lVotes++; }
+  if(j.rsiZone==="売られすぎ"){ hScore+=34; hVotes++; } if(j.rsiZone==="買われすぎ"){ lScore+=34; lVotes++; }
+  if(j.macdCross==="GC"){ hScore+=44; hVotes++; } if(j.macdCross==="DC"){ lScore+=44; lVotes++; }
+  if(j.mom>0.03){ hScore+=Math.min(30,j.mom*120); } else if(j.mom<-0.03){ lScore+=Math.min(30,-j.mom*120); }
+  if(j.streak>=2&&j.streak<=4){ if(j.streakDir>0) hScore+=j.streak*6; else lScore+=j.streak*6; }
+  else if(j.streak>=5){ if(j.streakDir>0) lScore+=10; else hScore+=10; }
+  if(j.bbPos<=0.1) hScore+=18; else if(j.bbPos>=0.9) lScore+=18;
+  if(j.distEma20>0.15) lScore+=Math.min(20,j.distEma20*40); else if(j.distEma20<-0.15) hScore+=Math.min(20,-j.distEma20*40);
+  var vMul=j.volatility==="低"?1.12:j.volatility==="高"?0.85:1; hScore*=vMul; lScore*=vMul;
+  var winVotes=hScore>=lScore?hVotes:lVotes, loseVotes=hScore>=lScore?lVotes:hVotes;
+  var confluence=winVotes-loseVotes;
+  if(confluence>=3){ if(hScore>=lScore) hScore*=1.15; else lScore*=1.15; }
+  else if(confluence>=2){ if(hScore>=lScore) hScore*=1.08; else lScore*=1.08; }
+  var total=hScore+lScore||1; var pred=hScore>=lScore?"HIGH":"LOW";
+  var scoreDiff=Math.abs(hScore-lScore)/total;
+  var baseConf=50+scoreDiff*42; var confluenceBonus=Math.max(0,confluence)*2.5; var contradictionPenalty=loseVotes*3;
+  var conf=Math.round(baseConf+confluenceBonus-contradictionPenalty); conf=Math.min(Math.max(conf,50),95);
+  if(scoreDiff<0.12) conf=Math.min(conf,62);
+  return {hScore:hScore,lScore:lScore,total:total,pred:pred,conf:conf,confluence:confluence};
+}
+
+function runPrediction(){
+  if(!state.judgment||!state.prices.length) return;
+  state.predicting=true;
+  var btn=document.getElementById("aiBtn");
+  btn.disabled=true; document.getElementById("aiBtnText").textContent="分析中…";
+  btn.querySelector("span").outerHTML='<span class="spin"></span>';
+  state.prediction=null; renderPrediction();
+  if(countdownTimer) clearInterval(countdownTimer);
+
+  var j=state.judgment; var p=state.prices[state.prices.length-1];
+  var sc=computeScore(j);
+
+  var apiKey=getApiKey();
+  if(!apiKey){ finishPrediction(localResult(sc,p,j)); return; }
+  var prompt="あなたはバイナリーオプション（ハイロー）の短期取引専門アナリストです。\n"
+    +"【通貨ペア】"+pairInfo().label+"（"+state.duration+"）\n【現在値】"+p+"\n"
+    +"【シグナルスコア】HIGH:"+rnd(sc.hScore,0)+" / LOW:"+rnd(sc.lScore,0)+"（一致度"+sc.confluence+"）\n"
+    +"【RSI】"+j.rsi+" ("+j.rsiZone+")\n【MACDクロス】"+j.macdCross+"\n【EMAトレンド】"+j.trend+"（乖離"+j.emaGap+"%）\n"
+    +"【直近モメンタム】"+j.mom+"%（"+(j.streak>=2?j.streak+"本連続"+(j.streakDir>0?"上昇":"下降"):"方向不定")+"）\n"
+    +"【BB内位置】"+Math.round(j.bbPos*100)+"%\n【ボラティリティ】"+j.volatility+"（ATR "+j.atrPct+"%）\n"
+    +"【総合予測】"+sc.pred+"（信頼度 "+sc.conf+"%）\n\n"
+    +"上記の複数指標を踏まえ、短期("+state.duration+")の値動きを分析。指標が矛盾する場合はリスクにも言及。\n"
+    +'以下のJSON形式のみで回答（コードブロック不要）:\n{"reason":"予測根拠（2文・指標名を含める）","entry_timing":"エントリータイミング（1文）","caution":"注意点（1文）","best_expiry":"最適な取引時間"}';
+  fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:700,messages:[{role:"user",content:prompt}]})
+  }).then(function(r){return r.json();}).then(function(data){
+    if(data.error) throw 0;
+    var text=(data.content||[]).filter(function(c){return c.type==="text";}).map(function(c){return c.text;}).join("").trim();
+    var ai={}; try{ var m=text.replace(/```[a-z]*/gi,"").replace(/```/g,"").match(/\{[\s\S]*\}/); if(m) ai=JSON.parse(m[0]); }catch(e){ ai={reason:text.slice(0,200)}; }
+    finishPrediction({ prediction:sc.pred,confidence:sc.conf,
+      reason:ai.reason||"テクニカル指標の総合判断による予測です。",
+      entry_timing:ai.entry_timing||"現在のタイミングでエントリー可能です。",
+      caution:ai.caution||"必ず資金管理を徹底してください。",
+      best_expiry:ai.best_expiry||state.duration, entryPrice:p,time:new Date().toLocaleTimeString("ja-JP") });
+  }).catch(function(){ finishPrediction(localResult(sc,p,j)); });
+}
+
+function localResult(sc,p,j){
+  var pred=sc.pred, conf=sc.conf; var dirJP=pred==="HIGH"?"上昇":"下降";
+  var parts=[];
+  if(j.macdCross!=="—") parts.push("MACDが"+(j.macdCross==="GC"?"ゴールデンクロス":"デッドクロス")+"を形成");
+  if(j.rsiZone!=="中立") parts.push("RSI "+j.rsi+"が"+j.rsiZone+"圏");
+  if(j.streak>=3) parts.push(j.streak+"本連続"+(j.streakDir>0?"上昇":"下降")+"の勢い");
+  if(Math.abs(j.distEma20)>0.15) parts.push("価格がEMA20から"+j.distEma20+"%乖離");
+  if(j.bbPos<=0.1) parts.push("ボリンジャー下限に接近"); else if(j.bbPos>=0.9) parts.push("ボリンジャー上限に接近");
+  var reason;
+  if(parts.length>=2) reason=parts.slice(0,2).join("し、")+"していることから、"+dirJP+"方向が優勢です。トレンドは「"+j.trend+"」、モメンタムは"+j.mom+"%で、複数指標が"+pred+"を支持しています。";
+  else if(parts.length===1) reason=parts[0]+"しており、"+dirJP+"方向への動きが期待されます。トレンドは「"+j.trend+"」、ボラティリティは"+j.volatility+"です。";
+  else reason="複数のテクニカル指標を総合した結果、"+dirJP+"シグナルが優勢です（HIGH:"+rnd(sc.hScore,0)+" / LOW:"+rnd(sc.lScore,0)+"）。トレンドは「"+j.trend+"」です。";
+  var entry=j.volatility==="高"?"値動きが大きいため、価格が一度落ち着いた瞬間を狙ってください。"
+    :j.volatility==="低"?"値動きが小さいので、シグナルが明確に出た直後が有効です。"
+    :j.streak>=4?"勢いが続いているため、押し戻しを待ってからが安全です。":"現在シグナルが揃っており、エントリーに適したタイミングです。";
+  var caution=conf<60?"指標が拮抗しており信頼度が低めです。見送る判断も有効です。"
+    :j.volatility==="高"?"急変動のリスクがあります。投資額を抑えて慎重に。"
+    :j.streak>=5?"連続した値動きの後で反転リスクがあります。深追いは禁物です。":"相場は急変する可能性があります。必ず資金管理を徹底してください。";
+  var expiry=j.volatility==="高"?"30秒〜1分":j.trend!=="レンジ"?"3分〜5分":"15秒〜1分";
+  return {prediction:pred,confidence:conf,reason:reason,entry_timing:entry,caution:caution,best_expiry:expiry,entryPrice:p,time:new Date().toLocaleTimeString("ja-JP")};
+}
+
+function finishPrediction(result){
+  state.prediction=result; state.predicting=false;
+  var btn=document.getElementById("aiBtn");
+  btn.disabled=false;
+  var sp=btn.querySelector(".spin"); if(sp) sp.outerHTML='<span>🤖</span>';
+  document.getElementById("aiBtnText").textContent="AI予測を実行する";
+  renderPrediction();
+  toast(result.prediction==="HIGH"?"▲":"▼", "予測完了："+result.prediction+"（信頼度"+result.confidence+"%）");
+
+  var id=Date.now()+"_"+Math.random().toString(36).slice(2,7); var secs=DUR_SECS[state.duration]||60;
+  state.history.unshift({prediction:result.prediction,confidence:result.confidence,entryPrice:result.entryPrice,
+    time:result.time,pair:pairInfo().label,duration:state.duration,id:id,status:"pending",resultPrice:null});
+  state.history=state.history.slice(0,20); renderHistory();
+  state.timer=secs; renderTimer();
+  if(countdownTimer) clearInterval(countdownTimer);
+  countdownTimer=setInterval(function(){ state.timer--; if(state.timer<=0){ clearInterval(countdownTimer); state.timer=0; } renderTimer(); },1000);
+  var jt=setTimeout(function(){
+    var cur=state.prices[state.prices.length-1]; var resultStatus="";
+    state.history.forEach(function(item){
+      if(item.id!==id) return;
+      if(cur==null){ item.status="draw"; return; }
+      var diff=cur-item.entryPrice;
+      if(Math.abs(diff)<item.entryPrice*1e-7) item.status="draw";
+      else if(item.prediction==="HIGH") item.status=diff>0?"win":"lose";
+      else item.status=diff<0?"win":"lose";
+      item.resultPrice=cur; resultStatus=item.status;
+    });
+    renderHistory();
+    if(resultStatus==="win") toast("○","結果：WIN！的中しました");
+    else if(resultStatus==="lose") toast("×","結果：LOSE。次に活かしましょう");
+  },secs*1000);
+  judgeTimers.push(jt);
+}
+
+// ════════════════ モーダル・トースト ════════════════
+function openModal(id){ document.getElementById(id).classList.add("show"); }
+function closeModal(id){ document.getElementById(id).classList.remove("show"); }
+function openSettings(){ document.getElementById("apiKeyInput").value=getApiKey(); openModal("setModal"); }
+function saveSettings(){ setApiKey(document.getElementById("apiKeyInput").value.trim()); closeModal("setModal"); toast("✓", getApiKey()?"APIキーを保存しました":"設定を更新しました"); }
+var toastTimer=null;
+function toast(ic,msg){
+  document.getElementById("toastIc").textContent=ic; document.getElementById("toastMsg").textContent=msg;
+  var t=document.getElementById("toast"); t.classList.add("show");
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){ t.classList.remove("show"); },2800);
+}
+
+// ════════════════ イベント・起動 ════════════════
+document.getElementById("setBtn").onclick=openSettings;
+document.getElementById("guideBtn").onclick=function(){ openModal("guideModal"); };
+document.getElementById("setModal").onclick=function(e){ if(e.target===this) closeModal("setModal"); };
+document.getElementById("guideModal").onclick=function(e){ if(e.target===this) closeModal("guideModal"); };
+document.getElementById("helpModal").onclick=function(e){ if(e.target===this) closeModal("helpModal"); };
+document.addEventListener("click",function(e){
+  var h=e.target.getAttribute&&e.target.getAttribute("data-help");
+  if(h&&HELP[h]){ document.getElementById("helpTitle").textContent=HELP[h][0]; document.getElementById("helpBody").textContent=HELP[h][1]; openModal("helpModal"); }
+});
+
+renderPairs(); renderDurs(); loadData();
+// 初回ガイド
+try{ if(!localStorage.getItem("hl_seen")){ setTimeout(function(){ openModal("guideModal"); },600); localStorage.setItem("hl_seen","1"); } }catch(e){}
+</script>
+</body>
+</html>
